@@ -1,0 +1,14 @@
+.bundle
+node_modules
+tmp
+log
+storage
+.env
+.byebug_history
+.DS_Store
+*.swp
+*.swo
+*~
+.git
+log/*.log
+storage

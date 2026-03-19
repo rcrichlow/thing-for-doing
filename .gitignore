@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+/tmp
+.bundle
+vendor/bundle
+
+# Build output
+dist/
+build/
+tmp/
+
+# Logs
+log/*.log
+*.log
+bun-debug.log*
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Docker volumes (development)
+postgres_data/
+db_data/
+
+# Bun
+bun.lockb
+
+# Project-local agent and evidence state
+.sisyphus/
+
+# Secrets
+api/config/master.key
+
+# Test artifacts
+client/playwright-report/
+client/test-results/
+
+# Rails specific
+storage
+.byebug_history
+.DS_Store
+Thumbs.db
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.editorconfig
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.class
+*.pyc
+*.egg-info
+dist-info

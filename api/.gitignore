@@ -1,0 +1,11 @@
+.bundle
+node_modules
+/tmp
+log/*.log
+storage
+.env
+.byebug_history
+.DS_Store
+*.swp
+*.swo
+*~

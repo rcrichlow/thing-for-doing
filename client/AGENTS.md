@@ -1,0 +1,59 @@
+# CLIENT KNOWLEDGE BASE
+
+## OVERVIEW
+React 18 + Vite frontend for working memory, boards, and drag-and-drop flows; Bun is the package manager and Playwright/Vitest cover the app.
+
+## WHERE TO LOOK
+| Task | Location | Notes |
+|---|---|---|
+| App routes / shell | `src/App.jsx`, `src/main.jsx` | Providers + route tree |
+| Working memory page | `src/pages/working-memory/WorkingMemoryView.jsx` | Home route, modal composer, keyboard-open flow |
+| Board state | `src/context/BoardContext.jsx` | Reducer-backed board/list/card state |
+| Board UX / DnD / card detail | `src/pages/BoardView.jsx` | List creation, card detail, drag handling |
+| Boards page | `src/pages/BoardsIndex.jsx` | Board creation tile, truncated board titles |
+| API calls | `src/services/api.js` | `/api` base path, shared request helper |
+| Unit/integration tests | `src/**/__tests__`, `src/components/*.test.jsx` | Vitest coverage |
+| E2E tests | `tests/e2e/` | Playwright helpers and integrated flow |
+
+## STRUCTURE
+```text
+client/
+├── src/components/
+├── src/context/
+├── src/pages/
+├── src/services/
+├── src/__tests__/
+└── tests/e2e/
+```
+
+## CONVENTIONS
+- Use Bun commands, usually via Docker: `docker compose exec client bun ...`.
+- Vite proxy owns backend access; keep API calls on `/api` instead of embedding `http://api:3000` in source files.
+- Preserve `data-testid` attributes unless tests are intentionally updated in the same change.
+- Keep Vitest scoped to app tests only; `vite.config.js` excludes `node_modules/**` and `tests/e2e/**` for a reason.
+- Follow current route structure exactly: `/`, `/working-memory`, `/boards`, `/boards/:id`.
+- `/` redirects to `/working-memory`; treat the working memory page as the default landing experience.
+- The working memory composer is a lightweight custom modal opened by typing anywhere outside form fields, not by an always-visible input.
+- Working memory modal behavior: semi-transparent gray backdrop, backdrop click closes, `Escape` cancels, and `Enter` submits via the single-line input.
+- Keep working memory UX intentionally lightweight for personal use; avoid overbuilding accessibility or modal infrastructure unless requested.
+
+## ANTI-PATTERNS
+- Do not switch package management back to Yarn or npm.
+- Do not use `bun test` for Vitest coverage here; use `bun run test`.
+- Do not rely on full visible board-title text in Playwright when titles can truncate in the UI.
+- Do not remove readiness polling from Task 23-style clean-start integration coverage without replacing it with equally robust startup synchronization.
+- Do not reintroduce a third-party modal library for working memory unless requirements change.
+- Do not reintroduce removed note or notebook UI flows without updating tests and evidence together.
+
+## COMMANDS
+```bash
+cd client && docker compose up -d
+cd client && docker compose exec client bun run test -- --run
+cd client && docker compose exec client bun run build
+cd client && docker compose exec client bunx playwright test
+```
+
+## NOTES
+- `playwright.config.cjs` uses CommonJS and system Chromium settings; preserve that unless you rework the Docker/browser story too.
+- `client/dist/`, `playwright-report/`, and `test-results/` are outputs, not authoritative code.
+- The current working memory implementation favors speed and simplicity over full accessibility semantics because the app is personal-use.
