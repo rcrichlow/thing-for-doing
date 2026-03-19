@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WorkingMemoryView from '../pages/working-memory/WorkingMemoryView';
 import * as api from '../services/api';
@@ -18,14 +18,14 @@ describe('WorkingMemoryView', () => {
     render(<WorkingMemoryView />);
 
     expect(await screen.findByText('Working Memory')).toBeInTheDocument();
-    expect(screen.getByTestId('working-memory-open-modal-btn')).toBeInTheDocument();
     expect(screen.queryByTestId('working-memory-modal-input')).not.toBeInTheDocument();
   });
 
-  it('opens the modal and closes it with backdrop click and Escape', async () => {
+  it('opens the modal on keydown and closes it with backdrop click and Escape', async () => {
     render(<WorkingMemoryView />);
+    await screen.findByText('Working Memory');
 
-    fireEvent.click(await screen.findByTestId('working-memory-open-modal-btn'));
+    fireEvent.keyDown(window, { key: 'a' });
 
     const input = await screen.findByTestId('working-memory-modal-input');
     fireEvent.change(input, { target: { value: 'Draft entry' } });
@@ -38,7 +38,7 @@ describe('WorkingMemoryView', () => {
       expect(screen.queryByTestId('working-memory-modal-input')).not.toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByTestId('working-memory-open-modal-btn'));
+    fireEvent.keyDown(window, { key: 'b' });
     const reopenedInput = await screen.findByTestId('working-memory-modal-input');
     fireEvent.change(reopenedInput, { target: { value: 'Another draft' } });
     fireEvent.keyDown(reopenedInput, { key: 'Escape' });
@@ -47,7 +47,7 @@ describe('WorkingMemoryView', () => {
       expect(screen.queryByTestId('working-memory-modal-input')).not.toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByTestId('working-memory-open-modal-btn'));
+    fireEvent.keyDown(window, { key: 'c' });
     expect((await screen.findByTestId('working-memory-modal-input')).value).toBe('');
   });
 
@@ -60,8 +60,9 @@ describe('WorkingMemoryView', () => {
     api.createWorkingMemoryEntry.mockResolvedValue(createdEntry);
 
     render(<WorkingMemoryView />);
+    await screen.findByText('Working Memory');
 
-    fireEvent.click(await screen.findByTestId('working-memory-open-modal-btn'));
+    fireEvent.keyDown(window, { key: 'R' });
 
     const input = await screen.findByTestId('working-memory-modal-input');
     fireEvent.change(input, { target: { value: 'Remember this' } });

@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_201532) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_144214) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "boards", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "title"
+    t.string "title", null: false
     t.datetime "updated_at", null: false
   end
 
@@ -25,8 +25,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_201532) do
     t.text "description"
     t.bigint "list_id", null: false
     t.integer "position"
-    t.string "title"
+    t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["list_id", "position"], name: "index_cards_on_list_id_and_position"
     t.index ["list_id"], name: "index_cards_on_list_id"
   end
 
@@ -34,13 +35,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_201532) do
     t.bigint "board_id", null: false
     t.datetime "created_at", null: false
     t.integer "position"
-    t.string "title"
+    t.string "title", null: false
     t.datetime "updated_at", null: false
+    t.index ["board_id", "position"], name: "index_lists_on_board_id_and_position"
     t.index ["board_id"], name: "index_lists_on_board_id"
   end
 
   create_table "working_memory_entries", force: :cascade do |t|
-    t.text "content"
+    t.text "content", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

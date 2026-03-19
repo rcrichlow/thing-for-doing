@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import BoardView from '../pages/BoardView';
+import BoardView from '../pages/boards/BoardView';
 import * as api from '../services/api';
 
 vi.mock('../services/api');

@@ -9,9 +9,7 @@ Api::Application.routes.draw do
     resources :cards, only: [:create]
   end
 
-  resources :cards, only: [:index, :show, :update, :destroy] do
-    resources :notes, only: [:create]
-  end
+  resources :cards, only: [:index, :show, :update, :destroy]
 
   resources :working_memory_entries, only: [:index, :create, :update, :destroy] do
     collection do

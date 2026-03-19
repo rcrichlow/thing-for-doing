@@ -204,7 +204,7 @@ export async function deleteCard(id) {
  * @returns {Promise<Array>} - Array of entry objects
  */
 export async function getWorkingMemoryEntries() {
-    return request('/working_memory_entries');
+  return request('/working_memory_entries');
 }
 
 /**
@@ -213,10 +213,10 @@ export async function getWorkingMemoryEntries() {
  * @returns {Promise<object>} - Created entry object
  */
 export async function createWorkingMemoryEntry(entryData) {
-    return request('/working_memory_entries', {
-        method: 'POST',
-        body: JSON.stringify({ entry: entryData })
-    });
+  return request('/working_memory_entries', {
+    method: 'POST',
+    body: JSON.stringify({ entry: entryData })
+  });
 }
 
 /**
@@ -226,10 +226,10 @@ export async function createWorkingMemoryEntry(entryData) {
  * @returns {Promise<object>} - Updated entry object
  */
 export async function updateWorkingMemoryEntry(id, entryData) {
-    return request(`/working_memory_entries/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ entry: entryData })
-    });
+  return request(`/working_memory_entries/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ entry: entryData })
+  });
 }
 
 /**
@@ -238,9 +238,9 @@ export async function updateWorkingMemoryEntry(id, entryData) {
  * @returns {Promise<null>} - null on success
  */
 export async function deleteWorkingMemoryEntry(id) {
-    return request(`/working_memory_entries/${id}`, {
-        method: 'DELETE'
-    });
+  return request(`/working_memory_entries/${id}`, {
+    method: 'DELETE'
+  });
 }
 
 /**
@@ -248,22 +248,7 @@ export async function deleteWorkingMemoryEntry(id) {
  * @returns {Promise<null>} - null on success
  */
 export async function clearWorkingMemory() {
-    return request('/working_memory_entries/destroy_all', {
-        method: 'DELETE'
-    });
+  return request('/working_memory_entries/destroy_all', {
+    method: 'DELETE'
+  });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

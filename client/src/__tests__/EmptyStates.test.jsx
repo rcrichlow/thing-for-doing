@@ -1,8 +1,8 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom';
-import BoardsIndex from '../pages/BoardsIndex';
-import BoardView from '../pages/BoardView';
+import BoardsIndex from '../pages/boards/BoardsIndex';
+import BoardView from '../pages/boards/BoardView';
 import { BoardProvider } from '../context/BoardContext';
 import * as api from '../services/api';
 

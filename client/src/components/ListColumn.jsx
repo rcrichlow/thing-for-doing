@@ -35,10 +35,6 @@ export default function ListColumn({ list, onCardAdded, onCardClick }) {
     }
   };
 
-  const handleListChange = (newCardIds) => {
-    console.log('changing list order: ', newCardIds);
-  };
-
   const cardIds = list.cards ? list.cards.map(card => card.id) : [];
 
   return (
@@ -53,7 +49,7 @@ export default function ListColumn({ list, onCardAdded, onCardClick }) {
       </div>
 
       <div className="p-3 flex-1 overflow-y-auto min-h-0 space-y-3">
-        <SortableContext onChange={handleListChange} items={cardIds} strategy={verticalListSortingStrategy}>
+        <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
           {list.cards && list.cards.map(card => (
             <CardItem
               key={card.id}
