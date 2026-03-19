@@ -6,12 +6,6 @@ class WorkingMemoryEntriesController < ApplicationController
     render json: serialize_entries(entries)
   end
 
-  # I don't know if we'll ever need to show a single entry - rcrichlow - 3/17/26
-  #def show
-  #    entry = WorkingMemoryEntry.find(params[:id])
-  #    render json: serialize_entries(entry)
-  #end
-
   def create
     entry = WorkingMemoryEntry.new(entry_params)
     if entry.save

@@ -19,4 +19,8 @@ class ApplicationController < ActionController::API
   def render_parameter_missing(exception)
     render json: { errors: [exception.message] }, status: :bad_request
   end
+
+  def ordered_records(records)
+    Array(records).sort_by { |record| [record.position || 0, record.id] }
+  end
 end

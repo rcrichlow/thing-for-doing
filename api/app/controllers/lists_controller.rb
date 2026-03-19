@@ -34,11 +34,7 @@ class ListsController < ApplicationController
 
   def serialize_list(list)
     list.as_json(include: :cards).tap do |payload|
-      payload['cards'] = ordered_cards(list.cards).map(&:as_json)
+      payload['cards'] = ordered_records(list.cards).map(&:as_json)
     end
-  end
-
-  def ordered_cards(cards)
-    Array(cards).sort_by { |card| [card.position || 0, card.id] }
   end
 end

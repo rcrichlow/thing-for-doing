@@ -50,13 +50,7 @@ class BoardsController < ApplicationController
   end
 
   def serialize_board(board)
-    board.as_json(
-      include: {
-        lists: {
-          include: :cards
-        }
-      }
-    ).tap do |payload|
+    board.as_json(include: serialized_board_includes).tap do |payload|
       payload['lists'] = ordered_records(board.lists).map do |list|
         list.as_json(include: :cards).tap do |list_payload|
           list_payload['cards'] = ordered_records(list.cards).map(&:as_json)
@@ -65,7 +59,11 @@ class BoardsController < ApplicationController
     end
   end
 
-  def ordered_records(records)
-    Array(records).sort_by { |record| [record.position || 0, record.id] }
+  def serialized_board_includes
+    {
+      lists: {
+        include: :cards
+      }
+    }
   end
 end

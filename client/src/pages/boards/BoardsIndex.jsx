@@ -18,7 +18,7 @@ export default function BoardsIndex() {
         const boards = await getBoards();
         dispatch({ type: actions.SET_BOARDS, payload: boards });
         setLocalError(null);
-      } catch (err) {
+      } catch {
         setLocalError('Failed to load boards');
       } finally {
         setLoading(false);
@@ -37,7 +37,7 @@ export default function BoardsIndex() {
       setNewBoardTitle('');
       setIsCreating(false);
       setLocalError(null);
-    } catch (err) {
+    } catch {
       setLocalError('Failed to create board');
     }
   };

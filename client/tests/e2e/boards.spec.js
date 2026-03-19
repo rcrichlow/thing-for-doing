@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupTestBoard, createList, createCard } from './helpers';
+import { setupTestBoard } from './helpers';
 
 test.describe('Board Management', () => {
   test('should create a board, add a list, and add a card', async ({ page }) => {
