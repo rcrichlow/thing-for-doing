@@ -8,11 +8,14 @@ React 18 + Vite frontend for working memory, boards, and drag-and-drop flows; Bu
 |---|---|---|
 | App routes / shell | `src/App.jsx`, `src/main.jsx` | Providers + route tree |
 | Working memory page | `src/pages/working-memory/WorkingMemoryView.jsx` | Home route, modal composer, keyboard-open flow, send-to-board flow |
-| Board state | `src/context/BoardContext.jsx` | Reducer-backed board/list/card state |
+| Board state | `src/context/BoardContext.jsx` | Reducer-backed board collection state only |
+| Working memory state hook | `src/hooks/useWorkingMemoryState.js` | Fetching entries, modal state, keyboard-open behavior |
+| Boards page state hook | `src/hooks/useBoardsIndexState.js` | Boards fetch/create state and board context updates |
 | Board UX / DnD / card detail | `src/pages/boards/BoardView.jsx` | List creation, card detail modal, drag handling |
 | Boards page | `src/pages/boards/BoardsIndex.jsx` | Board creation tile, truncated board titles |
 | Shared modal pattern | `src/components/Modal.jsx` | Reused custom modal for working memory and card details |
 | Card detail editing | `src/components/CardDetailModal.jsx` | Centered modal, click-to-edit title/description |
+| Shared async error helper | `src/utils/getErrorMessage.js` | Normalizes unknown errors into UI-safe messages |
 | API calls | `src/services/api.js` | `/api` base path, shared request helper |
 | Unit/integration tests | `src/**/__tests__`, `src/components/*.test.jsx` | Vitest coverage |
 | E2E tests | `tests/e2e/` | Playwright helpers and integrated flow |
@@ -35,12 +38,15 @@ client/
 - Keep Vitest scoped to app tests only; `vite.config.js` excludes `node_modules/**` and `tests/e2e/**` for a reason.
 - Follow current route structure exactly: `/`, `/working-memory`, `/boards`, `/boards/:id`.
 - `/` redirects to `/working-memory`; treat the working memory page as the default landing experience.
+- `App.jsx` wraps page routes in `ErrorBoundary`; preserve route-level crash isolation when changing routing.
 - The working memory composer is a lightweight custom modal opened by typing anywhere outside form fields, not by an always-visible input.
 - Working memory modal behavior: semi-transparent gray backdrop, backdrop click closes, `Escape` cancels, and `Enter` submits via the single-line input.
 - Working memory entries support a send-to-board flow that keeps the entry in place while creating a card on a selected list.
 - The send-to-board modal supports inline board/list creation; avoid nested forms inside that dialog.
 - Card details use the same custom modal family as working memory, not a right-side drawer.
 - Card detail fields are display-first and become editable only after click.
+- Keep `BoardContext` focused on shared board collection data; page-local loading, form, and modal state belong in page hooks/components.
+- Prefer extracting page-specific orchestration into custom hooks when a page starts mixing data loading, modal state, and event wiring.
 - Keep working memory UX intentionally lightweight for personal use; avoid overbuilding accessibility or modal infrastructure unless requested.
 
 ## ANTI-PATTERNS

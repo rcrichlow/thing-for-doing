@@ -17,13 +17,13 @@ describe('WorkingMemoryView', () => {
   it('keeps the composer hidden until opened', async () => {
     render(<WorkingMemoryView />);
 
-    expect(await screen.findByText('Working Memory')).toBeInTheDocument();
+    expect(await screen.findByText('Entries')).toBeInTheDocument();
     expect(screen.queryByTestId('working-memory-modal-input')).not.toBeInTheDocument();
   });
 
   it('opens the modal on keydown and closes it with backdrop click and Escape', async () => {
     render(<WorkingMemoryView />);
-    await screen.findByText('Working Memory');
+    await screen.findByText('Entries');
 
     fireEvent.keyDown(window, { key: 'a' });
 
@@ -60,7 +60,7 @@ describe('WorkingMemoryView', () => {
     api.createWorkingMemoryEntry.mockResolvedValue(createdEntry);
 
     render(<WorkingMemoryView />);
-    await screen.findByText('Working Memory');
+    await screen.findByText('Entries');
 
     fireEvent.keyDown(window, { key: 'R' });
 

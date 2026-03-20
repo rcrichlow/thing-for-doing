@@ -1,48 +1,20 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useBoardContext } from '../../context/BoardContext';
-import { getBoards, createBoard } from '../../services/api';
 import EmptyState from '../../components/EmptyState';
+import useBoardsIndexState from '../../hooks/useBoardsIndexState';
 
 export default function BoardsIndex() {
-  const { state, dispatch, actions } = useBoardContext();
-  const [newBoardTitle, setNewBoardTitle] = useState('');
-  const [localError, setLocalError] = useState(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const {
+    boards,
+    newBoardTitle,
+    setNewBoardTitle,
+    localError,
+    isCreating,
+    setIsCreating,
+    loading,
+    handleCreateBoard
+  } = useBoardsIndexState();
 
-  useEffect(() => {
-    async function loadBoards() {
-      try {
-        setLoading(true);
-        const boards = await getBoards();
-        dispatch({ type: actions.SET_BOARDS, payload: boards });
-        setLocalError(null);
-      } catch {
-        setLocalError('Failed to load boards');
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadBoards();
-  }, [dispatch, actions.SET_BOARDS]);
-
-  const handleCreateBoard = async (e) => {
-    e.preventDefault();
-    if (!newBoardTitle.trim()) return;
-
-    try {
-      const newBoard = await createBoard({ title: newBoardTitle });
-      dispatch({ type: actions.ADD_BOARD, payload: newBoard });
-      setNewBoardTitle('');
-      setIsCreating(false);
-      setLocalError(null);
-    } catch {
-      setLocalError('Failed to create board');
-    }
-  };
-
-  if (loading && state.boards.length === 0) {
+  if (loading && boards.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-gray-500 text-lg animate-pulse">Loading your boards...</div>
@@ -51,7 +23,7 @@ export default function BoardsIndex() {
   }
 
   // Show EmptyState only if no boards AND not currently trying to create one
-  if (state.boards.length === 0 && !isCreating) {
+  if (boards.length === 0 && !isCreating) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-7xl h-[calc(100vh-100px)]">
          <div className="flex justify-between items-center mb-8">
@@ -92,7 +64,7 @@ export default function BoardsIndex() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {state.boards.map(board => (
+        {boards.map(board => (
           <Link
             key={board.id}
             to={`/boards/${board.id}`}

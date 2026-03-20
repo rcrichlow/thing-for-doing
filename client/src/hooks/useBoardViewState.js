@@ -1,19 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import useAsyncPageData from './useAsyncPageData';
+import getErrorMessage from '../utils/getErrorMessage';
 import {
   createList,
   getBoard,
   updateCard
 } from '../services/api';
-
-function getErrorMessage(error) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return 'Something went wrong';
-}
 
 function buildMovedBoard(board, activeId, overId) {
   const lists = board?.lists || [];
@@ -123,7 +116,7 @@ export default function useBoardViewState(boardId) {
 
       setBoard(boardData);
       setActionError(null);
-    }).catch(() => {});
+    }, { rethrow: false });
   }, [boardId, runAsync]);
 
   const handleCardClick = useCallback((card) => {

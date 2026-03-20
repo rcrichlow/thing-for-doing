@@ -1,8 +1,23 @@
+import { useEffect } from 'react';
+
 /**
  * Reusable modal component — wraps the existing inline backdrop/dialog pattern.
  * Repurposed from WorkingMemoryView's entry composer.
  */
 export default function Modal({ isOpen, onClose, title, titleDescription, children, footer, 'data-testid': testId }) {
+    useEffect(() => {
+        if (!isOpen) return;
+
+        function handleKeyDown(event) {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (

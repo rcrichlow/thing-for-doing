@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
-import { useBoardContext } from '../../context/BoardContext';
 import { getBoards, createBoard, createList, createCard } from '../../services/api';
 
 const NEW_BOARD = '__new__';
 const NEW_LIST = '__new__';
 
 export default function SendToBoardModal({ entry, onClose }) {
-    const { dispatch, actions } = useBoardContext();
     const [boards, setBoards] = useState([]);
     const [selectedBoardId, setSelectedBoardId] = useState('');
     const [selectedListId, setSelectedListId] = useState('');
@@ -30,11 +28,9 @@ export default function SendToBoardModal({ entry, onClose }) {
         setLoading(true);
         setError(null);
         try {
-            await createBoard({ title: newBoardName.trim() });
-            const freshBoards = await getBoards();
-            setBoards(freshBoards);
-            const newest = freshBoards.find(b => b.title === newBoardName.trim());
-            setSelectedBoardId(newest ? String(newest.id) : '');
+            const newBoard = await createBoard({ title: newBoardName.trim() });
+            setBoards(prev => [...prev, newBoard]);
+            setSelectedBoardId(String(newBoard.id));
             setNewBoardName('');
             setCreatingBoard(false);
             setSelectedListId('');
@@ -50,12 +46,13 @@ export default function SendToBoardModal({ entry, onClose }) {
         setLoading(true);
         setError(null);
         try {
-            await createList(selectedBoardId, { title: newListName.trim() });
-            const freshBoards = await getBoards();
-            setBoards(freshBoards);
-            const updatedBoard = freshBoards.find(b => String(b.id) === String(selectedBoardId));
-            const newest = updatedBoard?.lists?.find(l => l.title === newListName.trim());
-            setSelectedListId(newest ? String(newest.id) : '');
+            const newList = await createList(selectedBoardId, { title: newListName.trim() });
+            setBoards(prev => prev.map(b =>
+                String(b.id) === String(selectedBoardId)
+                    ? { ...b, lists: [...(b.lists || []), newList] }
+                    : b
+            ));
+            setSelectedListId(String(newList.id));
             setNewListName('');
             setCreatingList(false);
         } catch (err) {
@@ -72,8 +69,7 @@ export default function SendToBoardModal({ entry, onClose }) {
         setError(null);
 
         try {
-            const card = await createCard(selectedListId, { title: entry.content });
-            dispatch({ type: actions.ADD_CARD, payload: card });
+            await createCard(selectedListId, { title: entry.content });
             onClose();
         } catch (err) {
             setError('Failed to create card');

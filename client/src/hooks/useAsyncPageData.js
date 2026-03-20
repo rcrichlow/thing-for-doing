@@ -1,12 +1,5 @@
 import { useCallback, useState } from 'react';
-
-function getErrorMessage(error) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return 'Something went wrong';
-}
+import getErrorMessage from '../utils/getErrorMessage';
 
 export default function useAsyncPageData({ initialLoading = true } = {}) {
   const [loading, setLoading] = useState(initialLoading);
@@ -16,7 +9,7 @@ export default function useAsyncPageData({ initialLoading = true } = {}) {
     setError(null);
   }, []);
 
-  const runAsync = useCallback(async (operation, { clearPreviousError = true } = {}) => {
+  const runAsync = useCallback(async (operation, { clearPreviousError = true, rethrow = true } = {}) => {
     try {
       setLoading(true);
 
@@ -27,7 +20,7 @@ export default function useAsyncPageData({ initialLoading = true } = {}) {
       return await operation();
     } catch (err) {
       setError(getErrorMessage(err));
-      throw err;
+      if (rethrow) throw err;
     } finally {
       setLoading(false);
     }

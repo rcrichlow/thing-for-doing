@@ -7,15 +7,19 @@ export default function CardDetailModal({ card, onClose, onUpdate }) {
     const [descriptionEditing, setDescriptionEditing] = useState(false);
     const [title, setTitle] = useState(card.title || '');
     const [description, setDescription] = useState(card.description || '');
+    const [saveError, setSaveError] = useState(null);
 
     async function save() {
         if (title === card.title && description === (card.description || '')) {
             return;
         }
         try {
+            setSaveError(null);
             const updated = await updateCard(card.id, { title, description });
             onUpdate(updated);
-        } catch { }
+        } catch (err) {
+            setSaveError(err.message || 'Failed to save changes');
+        }
     }
 
     function handleClose() {
@@ -39,6 +43,11 @@ export default function CardDetailModal({ card, onClose, onUpdate }) {
             }
             data-testid="card-detail"
         >
+            {saveError && (
+                <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700" role="alert">
+                    {saveError}
+                </div>
+            )}
             <div className="mb-4">
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                     Title

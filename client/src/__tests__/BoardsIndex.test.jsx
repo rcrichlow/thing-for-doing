@@ -33,7 +33,7 @@ describe('BoardsIndex', () => {
 
     api.getBoards.mockResolvedValue(mockBoards);
     BoardContext.useBoardContext.mockReturnValue({
-      state: { boards: mockBoards, loading: false },
+      state: { boards: mockBoards },
       dispatch: mockDispatch,
       actions: mockActions,
     });
@@ -58,7 +58,7 @@ describe('BoardsIndex', () => {
     api.createBoard.mockResolvedValue(newBoard);
     
     BoardContext.useBoardContext.mockReturnValue({
-      state: { boards: mockBoards, loading: false },
+      state: { boards: mockBoards },
       dispatch: mockDispatch,
       actions: mockActions,
     });

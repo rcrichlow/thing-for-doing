@@ -13,9 +13,9 @@ function App() {
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/working-memory" replace />} />
-            <Route path="/working-memory" element={<WorkingMemoryView />} />
-            <Route path="/boards" element={<BoardsIndex />} />
-            <Route path="boards/:id" element={<BoardView />} />
+            <Route path="/working-memory" element={<ErrorBoundary><WorkingMemoryView /></ErrorBoundary>} />
+            <Route path="/boards" element={<ErrorBoundary><BoardsIndex /></ErrorBoundary>} />
+            <Route path="boards/:id" element={<ErrorBoundary><BoardView /></ErrorBoundary>} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

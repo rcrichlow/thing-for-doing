@@ -32,12 +32,15 @@ thing-for-doing/
 ## CODE MAP
 | Symbol | Type | Location | Role |
 |---|---|---|---|
-| `BoardProvider` | context provider | `client/src/context/BoardContext.jsx` | Global board/list/card state |
+| `BoardProvider` | context provider | `client/src/context/BoardContext.jsx` | Global board collection state only |
 | `BoardView` | page | `client/src/pages/boards/BoardView.jsx` | Board detail, list creation, card detail modal, DnD |
+| `useBoardsIndexState` | custom hook | `client/src/hooks/useBoardsIndexState.js` | Boards page fetch/create state and board context updates |
 | `WorkingMemoryView` | page | `client/src/pages/working-memory/WorkingMemoryView.jsx` | Root page, entry list, lightweight modal composer, send-to-board entry flow |
+| `useWorkingMemoryState` | custom hook | `client/src/hooks/useWorkingMemoryState.js` | Working memory fetch/modal/form state |
 | `WorkingMemoryEntry` | component | `client/src/pages/working-memory/WorkingMemoryEntry.jsx` | Entry row with hover-triggered send-to-board action |
 | `SendToBoardModal` | component | `client/src/pages/working-memory/SendToBoardModal.jsx` | Board/list picker plus inline board/list creation before card creation |
 | `Modal` | shared component | `client/src/components/Modal.jsx` | Reused backdrop/dialog pattern for working memory and card details |
+| `ErrorBoundary` | component | `client/src/components/ErrorBoundary.jsx` | App-level and route-level error containment |
 | `CardDetailModal` | component | `client/src/components/CardDetailModal.jsx` | Click-to-edit card title/description modal |
 | `BoardsController` | controller | `api/app/controllers/boards_controller.rb` | Board CRUD with nested JSON payloads |
 | `WorkingMemoryEntriesController` | controller | `api/app/controllers/working_memory_entries_controller.rb` | Index/create/update/destroy working memory entries |
@@ -53,6 +56,9 @@ thing-for-doing/
 - Working memory entry creation is currently a lightweight custom modal opened by typing anywhere outside form fields; backdrop click and `Escape` close it, and `Enter` submits.
 - Working memory entries can be sent to boards without being removed; the send flow uses a custom modal with board/list selection plus inline board/list creation.
 - Card details now open in a centered modal, not a side drawer; title/description are click-to-edit.
+- `BoardContext` is intentionally scoped to board collection data; page-local list/card UI state should stay outside the context unless requirements change.
+- Page-specific state has started moving into custom hooks (`useWorkingMemoryState`, `useBoardsIndexState`) instead of growing page components further.
+- Shared modal keyboard dismissal (`Escape`) now lives in `client/src/components/Modal.jsx`; keep modal close behavior centralized there.
 - Prefer app/test changes over workaround noise in evidence files or generated output.
 
 ## ANTI-PATTERNS (THIS PROJECT)
