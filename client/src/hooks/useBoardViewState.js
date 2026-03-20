@@ -4,9 +4,48 @@ import useAsyncPageData from './useAsyncPageData';
 import getErrorMessage from '../utils/getErrorMessage';
 import {
   createList,
+  deleteCard,
+  deleteList,
   getBoard,
   updateCard
 } from '../services/api';
+
+function removeCardFromBoard(board, cardId) {
+  return {
+    ...board,
+    lists: board.lists.map((list) => ({
+      ...list,
+      cards: (list.cards || []).filter((card) => card.id !== cardId)
+    }))
+  };
+}
+
+function removeListFromBoard(board, listId, transferListId = null) {
+  const sourceList = board.lists.find((list) => list.id === listId);
+
+  if (!sourceList) {
+    return board;
+  }
+
+  return {
+    ...board,
+    lists: board.lists
+      .filter((list) => list.id !== listId)
+      .map((list) => {
+        if (transferListId && list.id === transferListId) {
+          return {
+            ...list,
+            cards: [
+              ...(list.cards || []),
+              ...(sourceList.cards || []).map((card) => ({ ...card, list_id: transferListId }))
+            ]
+          };
+        }
+
+        return list;
+      })
+  };
+}
 
 function buildMovedBoard(board, activeId, overId) {
   const lists = board?.lists || [];
@@ -104,6 +143,10 @@ export default function useBoardViewState(boardId) {
   const [newListTitle, setNewListTitle] = useState('');
   const [isCreatingList, setIsCreatingList] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [listPendingDelete, setListPendingDelete] = useState(null);
+  const [transferListId, setTransferListId] = useState('');
+  const [isDeletingCard, setIsDeletingCard] = useState(false);
+  const [isDeletingList, setIsDeletingList] = useState(false);
   const { loading, error, clearError, runAsync } = useAsyncPageData();
 
   useEffect(() => {
@@ -139,6 +182,101 @@ export default function useBoardViewState(boardId) {
       }))
     } : prev);
   }, []);
+
+  const handleCardDelete = useCallback(async (cardId) => {
+    if (!window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setIsDeletingCard(true);
+      await deleteCard(cardId);
+      setBoard((previousBoard) => (previousBoard ? removeCardFromBoard(previousBoard, cardId) : previousBoard));
+      setSelectedCard((currentCard) => (currentCard?.id === cardId ? null : currentCard));
+      setActionError(null);
+      clearError();
+    } catch (err) {
+      setActionError(`Failed to delete card: ${getErrorMessage(err)}`);
+    } finally {
+      setIsDeletingCard(false);
+    }
+  }, [clearError]);
+
+  const closeListDeleteModal = useCallback(() => {
+    if (isDeletingList) {
+      return;
+    }
+
+    setListPendingDelete(null);
+    setTransferListId('');
+  }, [isDeletingList]);
+
+  const handleListDeleteConfirm = useCallback(async ({ listId, transferListId: nextTransferListId = '' }) => {
+    const list = board?.lists?.find((candidate) => candidate.id === listId);
+
+    if (!list) {
+      return;
+    }
+
+    const parsedTransferListId = nextTransferListId ? Number(nextTransferListId) : null;
+    const transferList = parsedTransferListId
+      ? board.lists.find((candidate) => candidate.id === parsedTransferListId)
+      : null;
+    const hasCards = (list.cards || []).length > 0;
+
+    const confirmationMessage = transferList
+      ? `Are you sure you want to delete this list and move its cards to "${transferList.title}"? This action cannot be undone.`
+      : hasCards
+        ? 'Are you sure you want to delete this list? All cards in it will also be deleted. This action cannot be undone.'
+        : 'Are you sure you want to delete this list? This action cannot be undone.';
+
+    if (!window.confirm(confirmationMessage)) {
+      return;
+    }
+
+    try {
+      setIsDeletingList(true);
+      await deleteList(listId, parsedTransferListId ? { transfer_list_id: parsedTransferListId } : undefined);
+      setBoard((previousBoard) => (
+        previousBoard
+          ? removeListFromBoard(previousBoard, listId, parsedTransferListId)
+          : previousBoard
+      ));
+      setSelectedCard((currentCard) => {
+        if (!currentCard) {
+          return currentCard;
+        }
+
+        if (currentCard.list_id !== listId) {
+          return currentCard;
+        }
+
+        return parsedTransferListId
+          ? { ...currentCard, list_id: parsedTransferListId }
+          : null;
+      });
+      setActionError(null);
+      clearError();
+      setListPendingDelete(null);
+      setTransferListId('');
+    } catch (err) {
+      setActionError(`Failed to delete list: ${getErrorMessage(err)}`);
+    } finally {
+      setIsDeletingList(false);
+    }
+  }, [board, clearError]);
+
+  const handleListDeleteRequest = useCallback((list) => {
+    const otherLists = board?.lists?.filter((candidate) => candidate.id !== list.id) || [];
+
+    if ((list.cards || []).length > 0 && otherLists.length > 0) {
+      setListPendingDelete(list);
+      setTransferListId('');
+      return;
+    }
+
+    void handleListDeleteConfirm({ listId: list.id });
+  }, [board, handleListDeleteConfirm]);
 
   const handleCreateList = useCallback(async (event) => {
     event.preventDefault();
@@ -235,14 +373,23 @@ export default function useBoardViewState(boardId) {
     actionError,
     newListTitle,
     isCreatingList,
+    isDeletingCard,
+    isDeletingList,
     selectedCard,
+    listPendingDelete,
+    transferListId,
     setNewListTitle,
+    setTransferListId,
     handleDragStart,
     handleCardClick,
     closeCardDetail,
     handleCardUpdate,
+    handleCardDelete,
     handleCreateList,
     handleCardAdded,
-    handleDragEnd
+    handleDragEnd,
+    handleListDeleteRequest,
+    handleListDeleteConfirm,
+    closeListDeleteModal
   };
 }

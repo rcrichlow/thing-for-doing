@@ -81,5 +81,36 @@ RSpec.describe 'Lists API', type: :request do
       expect(response).to have_http_status(:no_content)
       expect(List.find_by(id: list_id)).to be_nil
     end
+
+    it 'transfers cards to another list before deleting the source list' do
+      board = Board.create!(title: 'My Board')
+      source_list = board.lists.create!(title: 'Source')
+      target_list = board.lists.create!(title: 'Target')
+      first_card = source_list.cards.create!(title: 'First', position: 0)
+      second_card = source_list.cards.create!(title: 'Second', position: 1)
+
+      delete "/lists/#{source_list.id}", params: { list: { transfer_list_id: target_list.id } }, as: :json
+
+      expect(response).to have_http_status(:no_content)
+      expect(List.find_by(id: source_list.id)).to be_nil
+      expect(target_list.cards.reload.pluck(:id, :position)).to eq(
+        [
+          [first_card.id, 0],
+          [second_card.id, 1]
+        ]
+      )
+    end
+
+    it 'returns validation errors for an invalid transfer target' do
+      board = Board.create!(title: 'My Board')
+      source_list = board.lists.create!(title: 'Source')
+      source_list.cards.create!(title: 'Keep Me')
+
+      delete "/lists/#{source_list.id}", params: { list: { transfer_list_id: source_list.id } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      json = JSON.parse(response.body)
+      expect(json['errors']).to include('Transfer list must belong to the same board')
+    end
   end
 end

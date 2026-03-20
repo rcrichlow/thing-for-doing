@@ -207,6 +207,21 @@ describe('API Service', () => {
       }));
       expect(result).toBeNull();
     });
+
+    it('deletes a list and includes a transfer target when provided', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 204
+      });
+
+      const result = await api.deleteList(101, { transfer_list_id: 202 });
+
+      expect(fetch).toHaveBeenCalledWith('/api/lists/101', expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({ list: { transfer_list_id: 202 } })
+      }));
+      expect(result).toBeNull();
+    });
   });
 
   describe('Card API', () => {

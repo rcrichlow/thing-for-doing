@@ -94,14 +94,14 @@ export async function updateList(id, listData) {
   });
 }
 
-/**
- * Delete a list
- * @param {number} id - List ID
- * @returns {Promise<null>} - null on success
- */
-export async function deleteList(id) {
+export async function deleteList(id, options = {}) {
+  const body = options.transfer_list_id
+    ? JSON.stringify({ list: { transfer_list_id: options.transfer_list_id } })
+    : undefined;
+
   return request(`/lists/${id}`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    ...(body ? { body } : {})
   });
 }
 

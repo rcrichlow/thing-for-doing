@@ -131,7 +131,7 @@ export default function SendToBoardModal({ entry, onClose }) {
             footer={footer}
             data-testid="send-to-board"
         >
-            <div className="mb-4 rounded-md bg-gray-50 p-3 text-sm text-gray-700">
+            <div className="mb-4 rounded-md bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words" data-testid="send-to-board-entry-preview">
                 <span className="font-medium text-gray-900">Entry: </span>
                 {entry.content}
             </div>

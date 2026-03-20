@@ -14,12 +14,16 @@ original entry.
 
 - Working Memory is the default landing flow
 - Keyboard-open working memory composer for fast capture
+- Inline editing for working memory entries
+- Per-entry working memory deletion
+- Multiline working memory entries with `Shift+Enter`
 - Clear all working memory entries in one action
 - Send a working memory entry to a board without removing the entry
 - Create boards from the boards page or inline during send-to-board
 - Create lists inside a board or inline during send-to-board
 - Create cards inside lists
-- Edit card title and description in a modal
+- Edit and delete cards in a modal
+- Delete lists from the board UI, with optional card transfer to another list
 - Reorder cards within a list and move them across lists with drag-and-drop
 - Route-level error boundaries for page isolation
 
@@ -33,7 +37,11 @@ original entry.
 ### Working Memory behavior
 
 - Typing anywhere outside form fields opens the composer modal
-- `Enter` submits the composer
+- Working memory entries can be edited inline by clicking them
+- `Shift+Enter` promotes the composer or inline edit field into multiline mode
+- In multiline mode, `Shift+Enter` inserts new lines and `Enter` still submits
+- Individual entries can be deleted with confirmation
+- `Enter` submits the composer or inline edit
 - `Escape` closes the composer
 - Backdrop click closes the composer
 - Entries can be sent to a board through a modal that supports:
@@ -41,6 +49,7 @@ original entry.
   - creating a new board inline
   - choosing an existing list
   - creating a new list inline
+  - previewing multiline entry text with preserved line breaks
 
 ### Board behavior
 
@@ -48,6 +57,9 @@ original entry.
 - Lists and cards are returned in stable `position` order
 - Card details open in a centered modal
 - Card title and description are click-to-edit fields
+- Card details include a delete action with confirmation
+- Lists can be deleted from the board UI
+- Deleting a non-empty list can optionally transfer its cards to another list before deletion
 
 ## Stack
 
@@ -165,6 +177,8 @@ E2E_CLEANUP=0 ./run-e2e.sh
 - Board payloads include nested lists and cards
 - Card ordering is persisted through `position`
 - The app uses shared modal primitives for working memory, send-to-board, and card details
+- Working memory supports inline editing, per-entry deletion, and multiline content
+- Board deletion flows use confirmations, and list deletion can transfer cards before removal
 - Tests are split across RSpec, Vitest, and Playwright
 
 ## Future Enhancement Ideas
