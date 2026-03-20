@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Modal from './Modal';
 import { updateCard } from '../services/api';
 
-export default function CardDetailModal({ card, onClose, onUpdate }) {
+export default function CardDetailModal({ card, onClose, onUpdate, onDelete, isDeleting = false }) {
     const [titleEditing, setTitleEditing] = useState(false);
     const [descriptionEditing, setDescriptionEditing] = useState(false);
     const [title, setTitle] = useState(card.title || '');
@@ -33,13 +33,25 @@ export default function CardDetailModal({ card, onClose, onUpdate }) {
             onClose={handleClose}
             title="Card details"
             footer={
-                <button
-                    type="button"
-                    onClick={handleClose}
-                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-                >
-                    Done
-                </button>
+                <>
+                    <button
+                        type="button"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => onDelete(card.id)}
+                        disabled={isDeleting}
+                        className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        data-testid="card-detail-delete-btn"
+                    >
+                        {isDeleting ? 'Deleting…' : 'Delete card'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleClose}
+                        className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                    >
+                        Done
+                    </button>
+                </>
             }
             data-testid="card-detail"
         >

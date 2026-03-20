@@ -33,15 +33,16 @@ thing-for-doing/
 | Symbol | Type | Location | Role |
 |---|---|---|---|
 | `BoardProvider` | context provider | `client/src/context/BoardContext.jsx` | Global board collection state only |
-| `BoardView` | page | `client/src/pages/boards/BoardView.jsx` | Board detail, list creation, card detail modal, DnD |
+| `BoardView` | page | `client/src/pages/boards/BoardView.jsx` | Board detail, list creation, card/list deletion flows, card detail modal, DnD |
 | `useBoardsIndexState` | custom hook | `client/src/hooks/useBoardsIndexState.js` | Boards page fetch/create state and board context updates |
 | `WorkingMemoryView` | page | `client/src/pages/working-memory/WorkingMemoryView.jsx` | Root page, entry list, lightweight modal composer, send-to-board entry flow |
-| `useWorkingMemoryState` | custom hook | `client/src/hooks/useWorkingMemoryState.js` | Working memory fetch/modal/form state |
-| `WorkingMemoryEntry` | component | `client/src/pages/working-memory/WorkingMemoryEntry.jsx` | Entry row with hover-triggered send-to-board action |
-| `SendToBoardModal` | component | `client/src/pages/working-memory/SendToBoardModal.jsx` | Board/list picker plus inline board/list creation before card creation |
+| `useWorkingMemoryState` | custom hook | `client/src/hooks/useWorkingMemoryState.js` | Working memory fetch/modal/form state, inline updates, multiline composer behavior |
+| `WorkingMemoryEntry` | component | `client/src/pages/working-memory/WorkingMemoryEntry.jsx` | Entry row with inline editing plus send/delete actions |
+| `SendToBoardModal` | component | `client/src/pages/working-memory/SendToBoardModal.jsx` | Board/list picker plus inline board/list creation and multiline entry preview |
 | `Modal` | shared component | `client/src/components/Modal.jsx` | Reused backdrop/dialog pattern for working memory and card details |
 | `ErrorBoundary` | component | `client/src/components/ErrorBoundary.jsx` | App-level and route-level error containment |
-| `CardDetailModal` | component | `client/src/components/CardDetailModal.jsx` | Click-to-edit card title/description modal |
+| `CardDetailModal` | component | `client/src/components/CardDetailModal.jsx` | Click-to-edit card title/description modal with delete action |
+| `ListDeleteModal` | component | `client/src/components/ListDeleteModal.jsx` | Optional card-transfer flow before list deletion |
 | `BoardsController` | controller | `api/app/controllers/boards_controller.rb` | Board CRUD with nested JSON payloads |
 | `WorkingMemoryEntriesController` | controller | `api/app/controllers/working_memory_entries_controller.rb` | Index/create/update/destroy working memory entries |
 | `setupTestBoard` | test helper | `client/tests/e2e/helpers.js` | Creates board, reads POST response, navigates by ID |
@@ -53,9 +54,11 @@ thing-for-doing/
 - Frontend API calls go through Vite proxy path `/api`, not hard-coded backend URLs.
 - Rails responses are plain JSON via `as_json`; preserve nested board/list/card shapes unless intentionally changing the API contract.
 - `/` redirects to `/working-memory`; treat working memory as the current home experience unless intentionally changing navigation.
-- Working memory entry creation is currently a lightweight custom modal opened by typing anywhere outside form fields; backdrop click and `Escape` close it, and `Enter` submits.
-- Working memory entries can be sent to boards without being removed; the send flow uses a custom modal with board/list selection plus inline board/list creation.
-- Card details now open in a centered modal, not a side drawer; title/description are click-to-edit.
+- Working memory entry creation is currently a lightweight custom modal opened by typing anywhere outside form fields; backdrop click and `Escape` close it, `Enter` submits, and `Shift+Enter` promotes the field into multiline mode.
+- Working memory entries support inline click-to-edit, preserve multiline content, and can be deleted individually with confirmation.
+- Working memory entries can be sent to boards without being removed; the send flow uses a custom modal with board/list selection, inline board/list creation, and a multiline-safe entry preview.
+- Card details now open in a centered modal, not a side drawer; title/description are click-to-edit and the modal includes card deletion.
+- Lists can be deleted from the board UI; when a non-empty list is removed and another list exists, the delete flow can transfer cards before the list is deleted.
 - `BoardContext` is intentionally scoped to board collection data; page-local list/card UI state should stay outside the context unless requirements change.
 - Page-specific state has started moving into custom hooks (`useWorkingMemoryState`, `useBoardsIndexState`) instead of growing page components further.
 - Shared modal keyboard dismissal (`Escape`) now lives in `client/src/components/Modal.jsx`; keep modal close behavior centralized there.

@@ -10,6 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import CardDetailModal from '../../components/CardDetailModal';
+import ListDeleteModal from '../../components/ListDeleteModal';
 import { StaticCardItem } from '../../components/CardItem';
 import ListColumn from '../../components/ListColumn';
 import EmptyState from '../../components/EmptyState';
@@ -25,16 +26,27 @@ export default function BoardView() {
     actionError,
     newListTitle,
     isCreatingList,
+    isDeletingCard,
+    isDeletingList,
     selectedCard,
+    listPendingDelete,
+    transferListId,
     setNewListTitle,
+    setTransferListId,
     handleDragStart,
     handleCardClick,
     closeCardDetail,
     handleCardUpdate,
+    handleCardDelete,
     handleCreateList,
     handleCardAdded,
-    handleDragEnd
+    handleDragEnd,
+    handleListDeleteRequest,
+    handleListDeleteConfirm,
+    closeListDeleteModal
   } = useBoardViewState(id);
+
+  const availableTransferLists = board?.lists?.filter((list) => list.id !== listPendingDelete?.id) || [];
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -111,6 +123,7 @@ export default function BoardView() {
                 list={list}
                 onCardAdded={handleCardAdded}
                 onCardClick={handleCardClick}
+                onDeleteList={handleListDeleteRequest}
               />
             ))}
 
@@ -188,6 +201,20 @@ export default function BoardView() {
           card={selectedCard}
           onClose={closeCardDetail}
           onUpdate={handleCardUpdate}
+          onDelete={handleCardDelete}
+          isDeleting={isDeletingCard}
+        />
+      )}
+
+      {listPendingDelete && (
+        <ListDeleteModal
+          list={listPendingDelete}
+          availableLists={availableTransferLists}
+          transferListId={transferListId}
+          onTransferListIdChange={setTransferListId}
+          onClose={closeListDeleteModal}
+          onConfirm={handleListDeleteConfirm}
+          isDeleting={isDeletingList}
         />
       )}
     </div>

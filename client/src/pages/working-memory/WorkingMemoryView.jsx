@@ -10,6 +10,7 @@ export default function WorkingMemoryView() {
         open,
         entries,
         sendToBoardEntry,
+        isMultilineComposer,
         setSendToBoardEntry,
         inputRef,
         formRef,
@@ -18,7 +19,9 @@ export default function WorkingMemoryView() {
         closeModal,
         handleSubmit,
         handleInputKeyDown,
-        handleClearEntries
+        handleClearEntries,
+        handleDeleteEntry,
+        handleUpdateEntry
     } = useWorkingMemoryState();
 
     return (
@@ -57,6 +60,8 @@ export default function WorkingMemoryView() {
                         key={entry.id}
                         entry={entry}
                         onSendToBoard={setSendToBoardEntry}
+                        onDeleteEntry={handleDeleteEntry}
+                        onUpdateEntry={handleUpdateEntry}
                     />
                 ))}
             </div>
@@ -66,7 +71,7 @@ export default function WorkingMemoryView() {
                 isOpen={open}
                 onClose={closeModal}
                 title="New working memory entry"
-                titleDescription="Press Enter to save or Escape to close."
+                titleDescription="Press Enter to save, Shift+Enter for multiple lines, or Escape to close."
                 data-testid="working-memory-modal"
                 footer={
                     <>
@@ -89,16 +94,29 @@ export default function WorkingMemoryView() {
                 }
             >
                 <form id="working-memory-form" ref={formRef} onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        ref={inputRef}
-                        value={value}
-                        onChange={(event) => setValue(event.target.value)}
-                        onKeyDown={handleInputKeyDown}
-                        className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="What are you thinking?"
-                        data-testid="working-memory-modal-input"
-                    />
+                    {isMultilineComposer ? (
+                        <textarea
+                            ref={inputRef}
+                            value={value}
+                            onChange={(event) => setValue(event.target.value)}
+                            onKeyDown={handleInputKeyDown}
+                            rows={5}
+                            className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            placeholder="What are you thinking?"
+                            data-testid="working-memory-modal-input"
+                        />
+                    ) : (
+                        <input
+                            type="text"
+                            ref={inputRef}
+                            value={value}
+                            onChange={(event) => setValue(event.target.value)}
+                            onKeyDown={handleInputKeyDown}
+                            className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="What are you thinking?"
+                            data-testid="working-memory-modal-input"
+                        />
+                    )}
                 </form>
             </Modal>
 

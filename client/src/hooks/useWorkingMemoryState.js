@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getWorkingMemoryEntries, createWorkingMemoryEntry, clearWorkingMemory } from '../services/api';
+import { getWorkingMemoryEntries, createWorkingMemoryEntry, updateWorkingMemoryEntry, deleteWorkingMemoryEntry, clearWorkingMemory } from '../services/api';
 import useAsyncPageData from './useAsyncPageData';
+import insertTextAtSelection from '../utils/insertTextAtSelection';
 
 export default function useWorkingMemoryState() {
   const [value, setValue] = useState('');
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState([]);
   const [sendToBoardEntry, setSendToBoardEntry] = useState(null);
+  const [isMultilineComposer, setIsMultilineComposer] = useState(false);
   const inputRef = useRef(null);
   const formRef = useRef(null);
+  const pendingCursorPositionRef = useRef(null);
   const { loading, error, runAsync } = useAsyncPageData();
 
   useEffect(() => {
@@ -39,15 +42,19 @@ export default function useWorkingMemoryState() {
 
   useEffect(() => {
     if (open) {
-      inputRef.current.focus();
-      const cursorPosition = value.length;
-      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      inputRef.current?.focus();
+
+      const cursorPosition = pendingCursorPositionRef.current ?? value.length;
+      inputRef.current?.setSelectionRange(cursorPosition, cursorPosition);
+      pendingCursorPositionRef.current = null;
     }
-  }, [open, value]);
+  }, [open, value, isMultilineComposer]);
 
   const closeModal = useCallback(() => {
     setOpen(false);
     setValue('');
+    setIsMultilineComposer(false);
+    pendingCursorPositionRef.current = null;
   }, []);
 
   const handleSubmit = useCallback(async (event) => {
@@ -62,14 +69,26 @@ export default function useWorkingMemoryState() {
     setEntries(currentEntries => [...currentEntries, entry]);
     setOpen(false);
     setValue('');
+    setIsMultilineComposer(false);
+    pendingCursorPositionRef.current = null;
   }, [value]);
 
   const handleInputKeyDown = useCallback((event) => {
+    if (event.key === 'Enter' && event.shiftKey) {
+      event.preventDefault();
+
+      const { nextValue, cursorPosition } = insertTextAtSelection(value, event.currentTarget, '\n');
+      pendingCursorPositionRef.current = cursorPosition;
+      setValue(nextValue);
+      setIsMultilineComposer(true);
+      return;
+    }
+
     if (event.key === 'Enter') {
       event.preventDefault();
       formRef.current?.requestSubmit();
     }
-  }, []);
+  }, [value]);
 
   const handleClearEntries = useCallback(() => {
     if (window.confirm('Are you sure you want to clear all working memory entries? This action cannot be undone.')) {
@@ -81,12 +100,41 @@ export default function useWorkingMemoryState() {
     }
   }, []);
 
+  const handleDeleteEntry = useCallback((entryId) => {
+    if (window.confirm('Are you sure you want to delete this working memory entry? This action cannot be undone.')) {
+      deleteWorkingMemoryEntry(entryId)
+        .then(() => {
+          setEntries(currentEntries => currentEntries.filter(entry => entry.id !== entryId));
+        })
+        .catch(err => {
+          console.error('Error deleting working memory entry:', err);
+        });
+    }
+  }, []);
+
+  const handleUpdateEntry = useCallback(async (entryId, content) => {
+    const trimmedContent = content.trim();
+
+    if (!trimmedContent) {
+      return null;
+    }
+
+    const updatedEntry = await updateWorkingMemoryEntry(entryId, { content: trimmedContent });
+
+    setEntries((currentEntries) => currentEntries.map((entry) => (
+      entry.id === entryId ? updatedEntry : entry
+    )));
+
+    return updatedEntry;
+  }, []);
+
   return {
     value,
     setValue,
     open,
     entries,
     sendToBoardEntry,
+    isMultilineComposer,
     setSendToBoardEntry,
     inputRef,
     formRef,
@@ -95,6 +143,8 @@ export default function useWorkingMemoryState() {
     closeModal,
     handleSubmit,
     handleInputKeyDown,
-    handleClearEntries
+    handleClearEntries,
+    handleDeleteEntry,
+    handleUpdateEntry
   };
 }
