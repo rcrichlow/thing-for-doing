@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { getWorkingMemoryEntries, createWorkingMemoryEntry, clearWorkingMemory } from '../../services/api';
+import WorkingMemoryEntry from './WorkingMemoryEntry';
+import SendToBoardModal from './SendToBoardModal';
 
 export default function WorkingMemoryView() {
     const [value, setValue] = useState('');
     const [open, setOpen] = useState(false);
     const [entries, setEntries] = useState([]);
+    const [sendToBoardEntry, setSendToBoardEntry] = useState(null);
     const inputRef = useRef(null);
     const formRef = useRef(null);
 
@@ -12,7 +15,7 @@ export default function WorkingMemoryView() {
 
     useEffect(() => {
         function handleKeyDown(event) {
-            if (open) {
+            if (open || sendToBoardEntry) {
                 return;
             }
 
@@ -27,7 +30,7 @@ export default function WorkingMemoryView() {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [open]);
+    }, [open, sendToBoardEntry]);
 
     useEffect(() => {
         if (open) {
@@ -75,10 +78,6 @@ export default function WorkingMemoryView() {
         }
     }
 
-    function getEntryTitle(entry) {
-        return `${new Date(entry.updated_at).toLocaleDateString()} ${new Date(entry.updated_at).toLocaleTimeString()}`;
-    }
-
     return (
         <div className="p-4">
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Working Memory</h1>
@@ -96,9 +95,11 @@ export default function WorkingMemoryView() {
                     </button>
                 </div>
                 {entries.toReversed().map(entry => (
-                    <div key={entry.id} title={getEntryTitle(entry)}>
-                         {entry.content}
-                    </div>
+                    <WorkingMemoryEntry
+                        key={entry.id}
+                        entry={entry}
+                        onSendToBoard={setSendToBoardEntry}
+                    />
                 ))}
             </div>
 
@@ -163,6 +164,13 @@ export default function WorkingMemoryView() {
                     </div>
                 </div>
             ) : null}
+
+            {sendToBoardEntry && (
+                <SendToBoardModal
+                    entry={sendToBoardEntry}
+                    onClose={() => setSendToBoardEntry(null)}
+                />
+            )}
         </div>
     )
 }

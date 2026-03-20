@@ -134,6 +134,19 @@ export default function useBoardViewState(boardId) {
     setSelectedCard(null);
   }, []);
 
+  const handleCardUpdate = useCallback((updatedCard) => {
+    setSelectedCard(updatedCard);
+    setBoard(prev => prev ? {
+      ...prev,
+      lists: prev.lists.map(list => ({
+        ...list,
+        cards: list.cards?.map(card =>
+          card.id === updatedCard.id ? { ...card, ...updatedCard } : card
+        )
+      }))
+    } : prev);
+  }, []);
+
   const handleCreateList = useCallback(async (event) => {
     event.preventDefault();
 
@@ -234,6 +247,7 @@ export default function useBoardViewState(boardId) {
     handleDragStart,
     handleCardClick,
     closeCardDetail,
+    handleCardUpdate,
     handleCreateList,
     handleCardAdded,
     handleDragEnd

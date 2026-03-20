@@ -9,7 +9,7 @@ import {
   KeyboardSensor
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import BoardCardDetailDrawer from '../../components/BoardCardDetailDrawer';
+import CardDetailModal from '../../components/CardDetailModal';
 import { StaticCardItem } from '../../components/CardItem';
 import ListColumn from '../../components/ListColumn';
 import EmptyState from '../../components/EmptyState';
@@ -30,6 +30,7 @@ export default function BoardView() {
     handleDragStart,
     handleCardClick,
     closeCardDetail,
+    handleCardUpdate,
     handleCreateList,
     handleCardAdded,
     handleDragEnd
@@ -182,10 +183,13 @@ export default function BoardView() {
         </DragOverlay>
       </DndContext>
 
-      <BoardCardDetailDrawer
-        selectedCard={selectedCard}
-        onClose={closeCardDetail}
-      />
+      {selectedCard && (
+        <CardDetailModal
+          card={selectedCard}
+          onClose={closeCardDetail}
+          onUpdate={handleCardUpdate}
+        />
+      )}
     </div>
   );
 }

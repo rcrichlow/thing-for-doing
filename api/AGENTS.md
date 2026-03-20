@@ -34,6 +34,7 @@ api/
 - Nested creation routes matter: lists under boards and cards under lists only.
 - Working memory entries are top-level resources at `/working_memory_entries` with index/create/update/destroy actions.
 - Keep working memory responses simple JSON shaped for the lightweight frontend modal flow unless requirements explicitly change.
+- The working-memory-to-board feature currently reuses existing `POST /boards`, `POST /boards/:board_id/lists`, and `POST /lists/:list_id/cards` endpoints; do not add a special-purpose backend route unless product scope changes.
 
 ## ANTI-PATTERNS
 - Do not assume host Ruby gems or local Postgres; use the compose stack.

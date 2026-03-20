@@ -7,10 +7,12 @@ React 18 + Vite frontend for working memory, boards, and drag-and-drop flows; Bu
 | Task | Location | Notes |
 |---|---|---|
 | App routes / shell | `src/App.jsx`, `src/main.jsx` | Providers + route tree |
-| Working memory page | `src/pages/working-memory/WorkingMemoryView.jsx` | Home route, modal composer, keyboard-open flow |
+| Working memory page | `src/pages/working-memory/WorkingMemoryView.jsx` | Home route, modal composer, keyboard-open flow, send-to-board flow |
 | Board state | `src/context/BoardContext.jsx` | Reducer-backed board/list/card state |
-| Board UX / DnD / card detail | `src/pages/BoardView.jsx` | List creation, card detail, drag handling |
-| Boards page | `src/pages/BoardsIndex.jsx` | Board creation tile, truncated board titles |
+| Board UX / DnD / card detail | `src/pages/boards/BoardView.jsx` | List creation, card detail modal, drag handling |
+| Boards page | `src/pages/boards/BoardsIndex.jsx` | Board creation tile, truncated board titles |
+| Shared modal pattern | `src/components/Modal.jsx` | Reused custom modal for working memory and card details |
+| Card detail editing | `src/components/CardDetailModal.jsx` | Centered modal, click-to-edit title/description |
 | API calls | `src/services/api.js` | `/api` base path, shared request helper |
 | Unit/integration tests | `src/**/__tests__`, `src/components/*.test.jsx` | Vitest coverage |
 | E2E tests | `tests/e2e/` | Playwright helpers and integrated flow |
@@ -35,6 +37,10 @@ client/
 - `/` redirects to `/working-memory`; treat the working memory page as the default landing experience.
 - The working memory composer is a lightweight custom modal opened by typing anywhere outside form fields, not by an always-visible input.
 - Working memory modal behavior: semi-transparent gray backdrop, backdrop click closes, `Escape` cancels, and `Enter` submits via the single-line input.
+- Working memory entries support a send-to-board flow that keeps the entry in place while creating a card on a selected list.
+- The send-to-board modal supports inline board/list creation; avoid nested forms inside that dialog.
+- Card details use the same custom modal family as working memory, not a right-side drawer.
+- Card detail fields are display-first and become editable only after click.
 - Keep working memory UX intentionally lightweight for personal use; avoid overbuilding accessibility or modal infrastructure unless requested.
 
 ## ANTI-PATTERNS
@@ -42,7 +48,7 @@ client/
 - Do not use `bun test` for Vitest coverage here; use `bun run test`.
 - Do not rely on full visible board-title text in Playwright when titles can truncate in the UI.
 - Do not remove readiness polling from Task 23-style clean-start integration coverage without replacing it with equally robust startup synchronization.
-- Do not reintroduce a third-party modal library for working memory unless requirements change.
+- Do not reintroduce a third-party modal library for working memory or card details unless requirements change.
 - Do not reintroduce removed note or notebook UI flows without updating tests and evidence together.
 
 ## COMMANDS
