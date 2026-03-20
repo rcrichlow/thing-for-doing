@@ -172,6 +172,7 @@ E2E_CLEANUP=0 ./run-e2e.sh
 These are ideas, not committed roadmap items.
 
 - UI refresh with improved spacing, hierarchy, and visual consistency
+- Accessibility improvements across keyboard use, semantics, and screen reader support
 - Dark mode
 - Better empty states
 - Global search across boards and cards
