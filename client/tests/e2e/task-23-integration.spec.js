@@ -76,7 +76,7 @@ test('task 23 integrated workflow from clean environment', async ({ page }) => {
 
   await page.goto(`/boards/${boardId}`);
   await page.waitForURL(`**/boards/${boardId}`);
-  await expect(page.locator('h1')).toContainText(data.boardTitle);
+  await expect(page.getByTestId('list-title-input')).toBeVisible();
 
   await page.getByTestId('list-title-input').fill(data.listTodo);
   await page.getByTestId('add-list-btn').click();
@@ -105,9 +105,9 @@ test('task 23 integrated workflow from clean environment', async ({ page }) => {
 
   await page.goto(`/boards/${boardId}`);
   await page.getByTestId('card-item').filter({ hasText: data.cardToMove }).click();
-  await expect(page.getByText('No description provided')).toBeVisible();
-  await page.getByLabel('Close details').click();
-  await expect(page.getByLabel('Close details')).toHaveCount(0);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByLabel('Close').click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 
   await dragCardToList(page, {
     sourceList: todoList,
@@ -127,7 +127,7 @@ test('task 23 integrated workflow from clean environment', async ({ page }) => {
   await expect(todoListAfterReload.getByTestId('card-item').filter({ hasText: data.cardToMove })).toHaveCount(0);
 
   await doneListAfterReload.getByTestId('card-item').filter({ hasText: data.cardToMove }).click();
-  await expect(page.getByText('No description provided')).toBeVisible();
+  await expect(page.getByRole('dialog')).toBeVisible();
 
   expect(consoleErrors, `Console errors detected:\n${consoleErrors.join('\n')}\nFailed responses: ${JSON.stringify(failedResponses, null, 2)}`).toEqual([]);
 

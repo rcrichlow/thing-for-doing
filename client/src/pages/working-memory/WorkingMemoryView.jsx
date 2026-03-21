@@ -25,18 +25,18 @@ export default function WorkingMemoryView() {
     } = useWorkingMemoryState();
 
     return (
-        <div className="p-4">
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Working Memory</h1>
-            <p className="text-gray-600">Start typing anywhere</p>
+        <div className="space-y-6 py-2">
+            <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">Working Memory</h1>
+            <p className="text-zinc-400">Start typing anywhere</p>
 
             {loading && entries.length === 0 && (
                 <div className="flex justify-center items-center h-64">
-                    <div className="text-gray-500 text-lg animate-pulse">Loading entries...</div>
+                    <div className="text-zinc-500 text-lg animate-pulse">Loading entries...</div>
                 </div>
             )}
 
             {error && (
-                <div className="mt-4 mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded shadow-sm">
+                <div className="mt-4 mb-4 p-4 bg-red-900/20 border-l-4 border-red-500 text-red-200 rounded shadow-sm">
                     <p className="font-medium">Error</p>
                     <p>{error}</p>
                 </div>
@@ -44,12 +44,12 @@ export default function WorkingMemoryView() {
 
             {!loading && !error && (
             <div>
-                <div className="mt-6 mb-4 flex items-center justify-between">
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Entries</h2>
+                <div className="flex items-center justify-between gap-4">
+                    <h2 className="text-xl font-bold text-zinc-200">Entries</h2>
                     <button
                         type="button"
                         onClick={handleClearEntries}
-                        className="rounded-md p-2 text-white bg-red-500 transition-colors"
+                        className="rounded-md bg-red-600/80 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-600"
                         aria-label="Clear all working memory entries"
                     >
                         Clear All
@@ -78,7 +78,7 @@ export default function WorkingMemoryView() {
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                            className="rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
                         >
                             Cancel
                         </button>
@@ -86,7 +86,7 @@ export default function WorkingMemoryView() {
                             type="submit"
                             form="working-memory-form"
                             disabled={!value.trim()}
-                            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Save entry
                         </button>
@@ -101,7 +101,7 @@ export default function WorkingMemoryView() {
                             onChange={(event) => setValue(event.target.value)}
                             onKeyDown={handleInputKeyDown}
                             rows={5}
-                            className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
                             placeholder="What are you thinking?"
                             data-testid="working-memory-modal-input"
                         />
@@ -112,7 +112,7 @@ export default function WorkingMemoryView() {
                             value={value}
                             onChange={(event) => setValue(event.target.value)}
                             onKeyDown={handleInputKeyDown}
-                            className="w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                             placeholder="What are you thinking?"
                             data-testid="working-memory-modal-input"
                         />

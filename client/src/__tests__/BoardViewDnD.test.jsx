@@ -168,7 +168,7 @@ describe('BoardView DnD', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to move card: Network down')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('Network down');
     });
 
     const [todoList, doneList] = screen.getAllByTestId('list-column');

@@ -119,7 +119,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
     return (
         <div className="py-1" data-testid={`wm-entry-${entry.id}`}>
             {saveError && (
-                <div className="mb-1 rounded-md bg-red-50 px-2 py-1 text-xs text-red-700" role="alert">
+                <div className="mb-1 rounded-md bg-red-900/20 px-2 py-1 text-xs text-red-300" role="alert">
                     {saveError}
                 </div>
             )}
@@ -129,7 +129,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
                     type="button"
                     onClick={() => onDeleteEntry(entry.id)}
                     disabled={isEditing || isSaving}
-                    className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-100 hover:text-red-600"
+                    className="rounded-md p-1.5 text-red-500 transition-colors hover:bg-red-900/30 hover:text-red-400"
                     aria-label="Delete entry"
                     data-testid={`wm-entry-delete-btn-${entry.id}`}
                 >
@@ -141,7 +141,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
                     type="button"
                     onClick={() => onSendToBoard(entry)}
                     disabled={isEditing || isSaving}
-                    className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-blue-100 hover:text-blue-600"
+                    className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-violet-900/20 hover:text-violet-400"
                     aria-label="Send to board"
                     data-testid={`wm-entry-send-btn-${entry.id}`}
                 >
@@ -161,7 +161,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
                             onKeyDown={handleInputKeyDown}
                             disabled={isSaving}
                             rows={4}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70 resize-none"
+                            className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:cursor-not-allowed disabled:opacity-70 resize-none"
                             data-testid={`wm-entry-input-${entry.id}`}
                         />
                     ) : (
@@ -173,7 +173,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
                             onBlur={handleBlur}
                             onKeyDown={handleInputKeyDown}
                             disabled={isSaving}
-                            className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-70"
+                            className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:cursor-not-allowed disabled:opacity-70"
                             data-testid={`wm-entry-input-${entry.id}`}
                         />
                     )
@@ -181,7 +181,7 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
                     <button
                         type="button"
                         onClick={startEditing}
-                        className="w-full rounded-md px-2 py-1.5 text-left text-sm text-gray-800 transition-colors hover:bg-gray-100 whitespace-pre-wrap break-words"
+                        className="w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-300 transition-colors hover:bg-zinc-800/50 whitespace-pre-wrap break-words"
                         data-testid={`wm-entry-content-btn-${entry.id}`}
                     >
                         {entry.content}

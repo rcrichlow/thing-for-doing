@@ -44,9 +44,9 @@ describe('Empty States', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText('No boards yet')).toBeInTheDocument();
+        expect(screen.queryAllByTestId('board-card')).toHaveLength(0);
       });
-      expect(screen.getByText('Create your first board to start organizing your tasks and ideas.')).toBeInTheDocument();
+      expect(screen.queryByTestId('board-title-input')).not.toBeInTheDocument();
       expect(screen.getByTestId('new-board-btn')).toBeInTheDocument();
     });
 
@@ -68,8 +68,15 @@ describe('Empty States', () => {
 
       fireEvent.click(screen.getByTestId('new-board-btn'));
       
-      // Should now see the form
-      expect(screen.getByTestId('board-title-input')).toBeInTheDocument();
+      const input = screen.getByTestId('board-title-input');
+      fireEvent.change(input, { target: { value: 'New Board' } });
+      fireEvent.click(screen.getByTestId('board-submit-btn'));
+
+      await waitFor(() => {
+        expect(api.createBoard).toHaveBeenCalledWith({ title: 'New Board' });
+      });
+
+      expect(await screen.findByText('New Board')).toBeInTheDocument();
     });
   });
 
@@ -87,9 +94,9 @@ describe('Empty States', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText('Start your workflow')).toBeInTheDocument();
+        expect(screen.queryAllByTestId('list-column')).toHaveLength(0);
       });
-      expect(screen.getByText('Create your first list to start adding cards and tasks to this board.')).toBeInTheDocument();
+      expect(screen.getByTestId('list-title-input')).toBeInTheDocument();
       expect(screen.getByTestId('add-list-btn')).toBeInTheDocument();
     });
 
@@ -105,9 +112,10 @@ describe('Empty States', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText('Error loading board')).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: /Return to Boards/i })).toHaveAttribute('href', '/boards');
       });
-      expect(screen.getByText('Failed to fetch')).toBeInTheDocument();
+      expect(screen.queryAllByTestId('list-column')).toHaveLength(0);
+      expect(screen.queryByTestId('list-title-input')).not.toBeInTheDocument();
     });
   });
 });

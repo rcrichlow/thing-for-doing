@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "bun -e \"console.error('Use ./run-e2e.sh from the repository root for isolated E2E tests.'); process.exit(1)\""
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

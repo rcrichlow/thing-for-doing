@@ -157,10 +157,10 @@ Frontend production build:
 cd client && docker compose exec client bun run build
 ```
 
-Frontend end-to-end tests against the standard stack:
+Frontend end-to-end tests use the isolated E2E stack only:
 
 ```bash
-cd client && docker compose exec client bunx playwright test
+./run-e2e.sh
 ```
 
 Isolated end-to-end tests with a dedicated Rails test stack:
@@ -169,6 +169,8 @@ Isolated end-to-end tests with a dedicated Rails test stack:
 ./run-e2e.sh
 E2E_CLEANUP=0 ./run-e2e.sh
 ```
+
+Raw Playwright invocation is intentionally blocked unless the isolated E2E environment is explicitly enabled. This prevents browser tests from writing into the normal development database.
 
 ## Implementation Notes
 
