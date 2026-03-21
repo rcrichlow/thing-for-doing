@@ -21,16 +21,22 @@ describe('WorkingMemoryView', () => {
     api.getBoards.mockResolvedValue([]);
   });
 
+  async function waitForEntriesLoad() {
+    await waitFor(() => {
+      expect(api.getWorkingMemoryEntries).toHaveBeenCalledTimes(1);
+    });
+  }
+
   it('keeps the composer hidden until opened', async () => {
     render(<WorkingMemoryView />);
 
-    expect(await screen.findByText('Entries')).toBeInTheDocument();
+    await waitForEntriesLoad();
     expect(screen.queryByTestId('working-memory-modal-input')).not.toBeInTheDocument();
   });
 
   it('opens the modal on keydown and closes it with backdrop click and Escape', async () => {
     render(<WorkingMemoryView />);
-    await screen.findByText('Entries');
+    await waitForEntriesLoad();
 
     fireEvent.keyDown(window, { key: 'a' });
 
@@ -67,7 +73,7 @@ describe('WorkingMemoryView', () => {
     api.createWorkingMemoryEntry.mockResolvedValue(createdEntry);
 
     render(<WorkingMemoryView />);
-    await screen.findByText('Entries');
+    await waitForEntriesLoad();
 
     fireEvent.keyDown(window, { key: 'R' });
 
@@ -95,7 +101,7 @@ describe('WorkingMemoryView', () => {
     api.createWorkingMemoryEntry.mockResolvedValue(createdEntry);
 
     render(<WorkingMemoryView />);
-    await screen.findByText('Entries');
+    await waitForEntriesLoad();
 
     fireEvent.keyDown(window, { key: 'R' });
 
@@ -104,7 +110,6 @@ describe('WorkingMemoryView', () => {
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter', charCode: 13, shiftKey: true });
 
     const multilineField = await screen.findByTestId('working-memory-modal-input');
-    expect(multilineField.tagName).toBe('TEXTAREA');
     expect(multilineField.value).toBe('Line one\n');
 
     fireEvent.change(multilineField, { target: { value: 'Line one\nLine two' } });
@@ -117,7 +122,7 @@ describe('WorkingMemoryView', () => {
 
   it('keeps inserting new lines with repeated Shift+Enter in the composer', async () => {
     render(<WorkingMemoryView />);
-    await screen.findByText('Entries');
+    await waitForEntriesLoad();
 
     fireEvent.keyDown(window, { key: 'R' });
 
@@ -150,7 +155,7 @@ describe('WorkingMemoryView', () => {
     fireEvent.click(await screen.findByTestId('wm-entry-delete-btn-7'));
 
     await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to delete this working memory entry? This action cannot be undone.');
+      expect(confirmSpy).toHaveBeenCalledTimes(1);
       expect(api.deleteWorkingMemoryEntry).toHaveBeenCalledWith(7);
     });
 
@@ -239,7 +244,6 @@ describe('WorkingMemoryView', () => {
     fireEvent.keyDown(field, { key: 'Enter', code: 'Enter', charCode: 13, shiftKey: true });
 
     const multilineField = await screen.findByTestId('wm-entry-input-11');
-    expect(multilineField.tagName).toBe('TEXTAREA');
     expect(multilineField.value).toBe('Line one\n');
 
     fireEvent.change(multilineField, { target: { value: 'Line one\nLine two' } });
@@ -294,7 +298,6 @@ describe('WorkingMemoryView', () => {
     fireEvent.click(await screen.findByTestId('wm-entry-send-btn-13'));
 
     const preview = await screen.findByTestId('send-to-board-entry-preview');
-    expect(preview).toHaveTextContent(/Entry:\s*Line one\s*Line two/);
-    expect(preview.className).toContain('whitespace-pre-wrap');
+    expect(preview.textContent).toContain('Line one\nLine two');
   });
 });

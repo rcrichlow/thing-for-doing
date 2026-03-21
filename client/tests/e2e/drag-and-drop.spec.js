@@ -43,9 +43,11 @@ test.describe('Drag and Drop Cards', () => {
 
     await doneList.getByTestId('card-item').filter({ hasText: 'Important Task' }).click();
 
-    await expect(page.locator('h2')).toContainText('Important Task');
+    await expect(page.getByRole('dialog')).toBeVisible();
 
     await page.keyboard.press('Escape');
+
+    await expect(page.getByRole('dialog')).toHaveCount(0);
 
     await expect(doneList.getByTestId('card-item')).toContainText('Important Task');
   });

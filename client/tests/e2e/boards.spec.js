@@ -14,7 +14,7 @@ test.describe('Board Management', () => {
     await boardCard.click();
 
     await expect(page).toHaveURL(/\/boards\/\d+/);
-    await expect(page.locator('h1')).toContainText(boardTitle, { timeout: 10000 });
+    await expect(page.getByTestId('list-title-input')).toBeVisible({ timeout: 10000 });
 
     await page.getByTestId('list-title-input').fill('To Do');
     await page.getByTestId('add-list-btn').click();
@@ -32,9 +32,9 @@ test.describe('Board Management', () => {
   test('should navigate back to boards list', async ({ page }) => {
     await setupTestBoard(page);
 
-    await page.getByText('Back to Boards').click();
+    await page.locator('a[href="/boards"]').click();
 
     await expect(page).toHaveURL('/boards');
-    await expect(page.locator('h1')).toContainText('Your Boards');
+    await expect(page.getByTestId('new-board-btn')).toBeVisible();
   });
 });

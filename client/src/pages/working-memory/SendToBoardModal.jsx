@@ -107,7 +107,7 @@ export default function SendToBoardModal({ entry, onClose }) {
             <button
                 type="button"
                 onClick={onClose}
-                className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                className="rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
             >
                 Cancel
             </button>
@@ -115,7 +115,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={!selectedListId || loading}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {loading ? 'Creating...' : 'Create card'}
             </button>
@@ -131,21 +131,21 @@ export default function SendToBoardModal({ entry, onClose }) {
             footer={footer}
             data-testid="send-to-board"
         >
-            <div className="mb-4 rounded-md bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap break-words" data-testid="send-to-board-entry-preview">
-                <span className="font-medium text-gray-900">Entry: </span>
+            <div className="mb-4 rounded-md bg-zinc-800 border border-zinc-700 p-3 text-sm text-zinc-300 whitespace-pre-wrap break-words" data-testid="send-to-board-entry-preview">
+                <span className="font-medium text-zinc-100">Entry: </span>
                 {entry.content}
             </div>
 
-            <div id="send-to-board-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+            <div id="send-to-board-form">
                 <div className="mb-4">
-                    <label htmlFor="board-select" className="mb-1 block text-sm font-medium text-gray-700">
+                    <label htmlFor="board-select" className="mb-1 block text-sm font-medium text-zinc-400">
                         Board
                     </label>
                     <select
                         id="board-select"
                         value={creatingBoard ? '' : selectedBoardId}
                         onChange={handleBoardChange}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500"
                         data-testid="send-to-board-board-select"
                     >
                         <option value="">Select a board</option>
@@ -165,7 +165,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                                 onChange={(e) => setNewBoardName(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateBoard(); } }}
                                 placeholder="New board name"
-                                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-zinc-500"
                                 autoFocus
                                 data-testid="send-to-board-new-board-input"
                             />
@@ -173,14 +173,14 @@ export default function SendToBoardModal({ entry, onClose }) {
                                 type="button"
                                 onClick={handleCreateBoard}
                                 disabled={!newBoardName.trim() || loading}
-                                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                                className="rounded-md bg-violet-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-50"
                             >
                                 Create
                             </button>
                             <button
                                 type="button"
                                 onClick={() => { setCreatingBoard(false); setNewBoardName(''); }}
-                                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                                className="rounded-md border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
                             >
                                 Cancel
                             </button>
@@ -189,7 +189,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                 </div>
 
                 <div className="mb-4">
-                    <label htmlFor="list-select" className="mb-1 block text-sm font-medium text-gray-700">
+                    <label htmlFor="list-select" className="mb-1 block text-sm font-medium text-zinc-400">
                         List
                     </label>
                     <select
@@ -197,7 +197,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                         value={creatingList ? '' : selectedListId}
                         onChange={handleListChange}
                         disabled={!selectedBoardId}
-                        className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-gray-100"
+                        className="w-full rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-900 disabled:text-zinc-600"
                         data-testid="send-to-board-list-select"
                     >
                         <option value="">Select a list</option>
@@ -217,7 +217,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                                 onChange={(e) => setNewListName(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleCreateList(); } }}
                                 placeholder="New list name"
-                                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-zinc-500"
                                 autoFocus
                                 data-testid="send-to-board-new-list-input"
                             />
@@ -225,14 +225,14 @@ export default function SendToBoardModal({ entry, onClose }) {
                                 type="button"
                                 onClick={handleCreateList}
                                 disabled={!newListName.trim() || loading}
-                                className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                                className="rounded-md bg-violet-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-violet-500 disabled:opacity-50"
                             >
                                 Create
                             </button>
                             <button
                                 type="button"
                                 onClick={() => { setCreatingList(false); setNewListName(''); }}
-                                className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                                className="rounded-md border border-zinc-700 px-3 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-800"
                             >
                                 Cancel
                             </button>
@@ -241,7 +241,7 @@ export default function SendToBoardModal({ entry, onClose }) {
                 </div>
 
                 {error && (
-                    <p className="text-sm text-red-600" data-testid="send-to-board-error">{error}</p>
+                    <p className="text-sm text-red-400" data-testid="send-to-board-error">{error}</p>
                 )}
             </div>
         </Modal>

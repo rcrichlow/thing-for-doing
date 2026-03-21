@@ -22,12 +22,12 @@ export default function Modal({ isOpen, onClose, title, titleDescription, childr
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-gray-700/50 px-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
             onClick={onClose}
             data-testid={testId ? `${testId}-backdrop` : undefined}
         >
             <div
-                className="w-full max-w-xl rounded-xl bg-white p-6 shadow-2xl"
+                className="w-full max-w-xl rounded-xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl"
                 onClick={(event) => event.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -35,17 +35,17 @@ export default function Modal({ isOpen, onClose, title, titleDescription, childr
             >
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
-                        <h2 id={testId ? `${testId}-title` : undefined} className="text-xl font-bold text-gray-900">
+                        <h2 id={testId ? `${testId}-title` : undefined} className="text-xl font-bold text-zinc-100 tracking-tight">
                             {title}
                         </h2>
                         {titleDescription && (
-                            <p className="mt-1 text-sm text-gray-600">{titleDescription}</p>
+                            <p className="mt-1 text-sm text-zinc-400">{titleDescription}</p>
                         )}
                     </div>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+                        className="rounded-md p-2 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                         aria-label="Close"
                     >
                         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export default function Modal({ isOpen, onClose, title, titleDescription, childr
                 {children}
 
                 {footer && (
-                    <div className="mt-4 flex justify-end gap-3">
+                    <div className="mt-6 flex justify-end gap-3 border-t border-zinc-800 pt-4">
                         {footer}
                     </div>
                 )}
