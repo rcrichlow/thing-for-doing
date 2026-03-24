@@ -55,6 +55,36 @@ export async function deleteBoard(id) {
   });
 }
 
+/**
+ * Fetch all archived boards
+ * @returns {Promise<Array>} - Array of board objects
+ */
+export async function getArchivedBoards() {
+  return request('/boards/archived');
+}
+
+/**
+ * Archive a board
+ * @param {number} id - Board ID
+ * @returns {Promise<object>} - Updated board object
+ */
+export async function archiveBoard(id) {
+  return request(`/boards/${id}/archive`, {
+    method: 'PATCH'
+  });
+}
+
+/**
+ * Unarchive a board
+ * @param {number} id - Board ID
+ * @returns {Promise<object>} - Updated board object
+ */
+export async function unarchiveBoard(id) {
+  return request(`/boards/${id}/unarchive`, {
+    method: 'PATCH'
+  });
+}
+
 // ==================== LISTS ====================
 
 /**

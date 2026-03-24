@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { arrayMove } from '@dnd-kit/sortable';
 import useAsyncPageData from './useAsyncPageData';
 import getErrorMessage from '../utils/getErrorMessage';
+import { useBoardContext } from '../context/BoardContext';
 import {
   createList,
   deleteCard,
   deleteList,
   getBoard,
-  updateCard
+  updateCard,
+  archiveBoard,
+  unarchiveBoard,
+  deleteBoard
 } from '../services/api';
 
 function removeCardFromBoard(board, cardId) {
@@ -137,6 +142,8 @@ function buildMovedBoard(board, activeId, overId) {
 }
 
 export default function useBoardViewState(boardId) {
+  const navigate = useNavigate();
+  const { dispatch, actions } = useBoardContext();
   const [board, setBoard] = useState(null);
   const [activeDragCardId, setActiveDragCardId] = useState(null);
   const [actionError, setActionError] = useState(null);
@@ -161,6 +168,44 @@ export default function useBoardViewState(boardId) {
       setActionError(null);
     }, { rethrow: false });
   }, [boardId, runAsync]);
+
+  const handleArchiveBoard = useCallback(async () => {
+    if (!board) return;
+    if (!window.confirm(`Archive board "${board.title}"? It will be moved to Archived Boards.`)) return;
+    try {
+      await archiveBoard(board.id);
+      dispatch({ type: actions.ARCHIVE_BOARD, payload: board });
+      navigate('/boards');
+    } catch (err) {
+      setActionError(`Failed to archive board: ${getErrorMessage(err)}`);
+    }
+  }, [board, dispatch, actions, navigate]);
+
+  const handleUnarchiveBoard = useCallback(async () => {
+    if (!board) return;
+    try {
+      await unarchiveBoard(board.id);
+      dispatch({
+        type: actions.UNARCHIVE_BOARD,
+        payload: { ...board, archived_at: null }
+      });
+      navigate('/boards');
+    } catch (err) {
+      setActionError(`Failed to unarchive board: ${getErrorMessage(err)}`);
+    }
+  }, [board, dispatch, actions, navigate]);
+
+  const handleDeleteBoard = useCallback(async () => {
+    if (!board) return;
+    if (!window.confirm(`Permanently delete board "${board.title}"? This cannot be undone.`)) return;
+    try {
+      await deleteBoard(board.id);
+      dispatch({ type: actions.DELETE_BOARD, payload: board.id });
+      navigate('/boards');
+    } catch (err) {
+      setActionError(`Failed to delete board: ${getErrorMessage(err)}`);
+    }
+  }, [board, dispatch, actions, navigate]);
 
   const handleCardClick = useCallback((card) => {
     setSelectedCard(card);
@@ -382,6 +427,9 @@ export default function useBoardViewState(boardId) {
     setTransferListId,
     handleDragStart,
     handleCardClick,
+    handleArchiveBoard,
+    handleUnarchiveBoard,
+    handleDeleteBoard,
     closeCardDetail,
     handleCardUpdate,
     handleCardDelete,

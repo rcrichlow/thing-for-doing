@@ -19,6 +19,7 @@ describe('BoardsIndex', () => {
   const mockActions = {
     SET_BOARDS: 'SET_BOARDS',
     ADD_BOARD: 'ADD_BOARD',
+    ARCHIVE_BOARD: 'ARCHIVE_BOARD',
   };
 
   beforeEach(() => {
@@ -85,5 +86,43 @@ describe('BoardsIndex', () => {
         payload: newBoard,
       });
     });
+  });
+
+  it('allows archiving a board', async () => {
+    const mockBoards = [
+      { id: 1, title: 'Project Alpha', created_at: '2023-01-01' },
+    ];
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    api.getBoards.mockResolvedValue(mockBoards);
+    api.archiveBoard.mockResolvedValue({ id: 1, title: 'Project Alpha', archived_at: '2023-01-04' });
+
+    BoardContext.useBoardContext.mockReturnValue({
+      state: { boards: mockBoards },
+      dispatch: mockDispatch,
+      actions: mockActions,
+    });
+
+    render(
+      <BrowserRouter>
+        <BoardsIndex />
+      </BrowserRouter>
+    );
+
+    await screen.findByText('Project Alpha');
+
+    const archiveBtn = screen.getByTestId('archive-board-1');
+    fireEvent.click(archiveBtn);
+
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(api.archiveBoard).toHaveBeenCalledWith(1);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: mockActions.ARCHIVE_BOARD,
+        payload: mockBoards[0],
+      });
+    });
+
+    confirmSpy.mockRestore();
   });
 });

@@ -1,17 +1,28 @@
+# frozen_string_literal: true
+
 Api::Application.routes.draw do
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 
   resources :boards do
-    resources :lists, only: [:create, :destroy]
+    collection do
+      get :archived
+    end
+
+    member do
+      patch :archive
+      patch :unarchive
+    end
+
+    resources :lists, only: %i[create destroy]
   end
 
-  resources :lists, only: [:update, :destroy] do
-    resources :cards, only: [:create]
+  resources :lists, only: %i[update destroy] do
+    resources :cards, only: %i[create]
   end
 
-  resources :cards, only: [:index, :show, :update, :destroy]
+  resources :cards, only: %i[index show update destroy]
 
-  resources :working_memory_entries, only: [:index, :create, :update, :destroy] do
+  resources :working_memory_entries, only: %i[index create update destroy] do
     collection do
       delete 'destroy_all'
     end

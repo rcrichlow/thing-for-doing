@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+  rescue_from ActiveRecord::RecordNotDestroyed, with: :render_record_not_destroyed
   rescue_from ActionController::ParameterMissing, with: :render_parameter_missing
 
   private
@@ -14,6 +15,10 @@ class ApplicationController < ActionController::API
     resource_name = exception.model.presence || 'Resource'
 
     render json: { errors: ["#{resource_name} not found"] }, status: :not_found
+  end
+
+  def render_record_not_destroyed(exception)
+    render_validation_errors(exception.record)
   end
 
   def render_parameter_missing(exception)

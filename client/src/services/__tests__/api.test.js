@@ -143,6 +143,48 @@ describe('API Service', () => {
       }));
       expect(result).toBeNull();
     });
+
+    it('fetches archived boards', async () => {
+      const mockBoards = [{ id: 1, title: 'Archived Board', archived_at: '2023-01-01' }];
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockBoards
+      });
+
+      const result = await api.getArchivedBoards();
+
+      expect(fetch).toHaveBeenCalledWith('/api/boards/archived', expect.any(Object));
+      expect(result).toEqual(mockBoards);
+    });
+
+    it('archives a board', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 204
+      });
+
+      const result = await api.archiveBoard(1);
+
+      expect(fetch).toHaveBeenCalledWith('/api/boards/1/archive', expect.objectContaining({
+        method: 'PATCH'
+      }));
+      expect(result).toBeNull();
+    });
+
+    it('unarchives a board', async () => {
+      global.fetch.mockResolvedValueOnce({
+        ok: true,
+        status: 204
+      });
+
+      const result = await api.unarchiveBoard(1);
+
+      expect(fetch).toHaveBeenCalledWith('/api/boards/1/unarchive', expect.objectContaining({
+        method: 'PATCH'
+      }));
+      expect(result).toBeNull();
+    });
   });
 
   describe('List API', () => {

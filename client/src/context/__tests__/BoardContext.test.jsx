@@ -63,6 +63,69 @@ describe('BoardContext', () => {
 
       expect(result.current.state.boards).toHaveLength(0);
     });
+
+    it('archives a board with ARCHIVE_BOARD', () => {
+      const { result } = renderHook(() => useBoardContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.SET_BOARDS,
+          payload: [{ id: 1, title: 'Board 1' }, { id: 2, title: 'Board 2' }]
+        });
+      });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.ARCHIVE_BOARD,
+          payload: { id: 1, title: 'Board 1', archived_at: '2026-03-24T12:00:00Z' }
+        });
+      });
+
+      expect(result.current.state.boards).toEqual([{ id: 2, title: 'Board 2' }]);
+    });
+
+    it('unarchives a board with UNARCHIVE_BOARD by adding it back to the active collection', () => {
+      const { result } = renderHook(() => useBoardContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.SET_BOARDS,
+          payload: [{ id: 2, title: 'Board 2' }]
+        });
+      });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.UNARCHIVE_BOARD,
+          payload: { id: 1, title: 'Board 1', archived_at: null }
+        });
+      });
+
+      expect(result.current.state.boards).toEqual([
+        { id: 2, title: 'Board 2' },
+        { id: 1, title: 'Board 1', archived_at: null }
+      ]);
+    });
+
+    it('unarchives a board with UNARCHIVE_BOARD by updating an existing active board entry', () => {
+      const { result } = renderHook(() => useBoardContext(), { wrapper });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.SET_BOARDS,
+          payload: [{ id: 1, title: 'Board 1', archived_at: '2026-03-23T12:00:00Z' }]
+        });
+      });
+
+      act(() => {
+        result.current.dispatch({
+          type: result.current.actions.UNARCHIVE_BOARD,
+          payload: { id: 1, title: 'Board 1', archived_at: null }
+        });
+      });
+
+      expect(result.current.state.boards).toEqual([{ id: 1, title: 'Board 1', archived_at: null }]);
+    });
   });
 
   describe('Hook Usage', () => {

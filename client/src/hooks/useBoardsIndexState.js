@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBoardContext } from '../context/BoardContext';
-import { getBoards, createBoard } from '../services/api';
+import { getBoards, createBoard, archiveBoard } from '../services/api';
 
 export default function useBoardsIndexState() {
   const { state, dispatch, actions } = useBoardContext();
@@ -40,6 +40,18 @@ export default function useBoardsIndexState() {
     }
   }, [newBoardTitle, dispatch, actions.ADD_BOARD]);
 
+  const handleArchiveBoard = useCallback(async (e, board) => {
+    e.preventDefault(); // Prevent navigation
+    if (!window.confirm(`Archive board "${board.title}"?`)) return;
+
+    try {
+      await archiveBoard(board.id);
+      dispatch({ type: actions.ARCHIVE_BOARD, payload: board });
+    } catch {
+      setLocalError('Failed to archive board');
+    }
+  }, [dispatch, actions.ARCHIVE_BOARD]);
+
   return {
     boards: state.boards,
     newBoardTitle,
@@ -48,6 +60,7 @@ export default function useBoardsIndexState() {
     isCreating,
     setIsCreating,
     loading,
-    handleCreateBoard
+    handleCreateBoard,
+    handleArchiveBoard
   };
 }

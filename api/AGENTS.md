@@ -6,7 +6,7 @@ Rails 8 JSON API for boards, lists, cards, and working memory entries backed by 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |---|---|---|
-| Resource routing | `config/routes.rb` | Nested create routes plus top-level CRUD |
+| Resource routing | `config/routes.rb` | Nested create routes plus top-level CRUD and board archive/unarchive routes |
 | CRUD behavior | `app/controllers/*_controller.rb` | Plain JSON, strong params, error status handling |
 | Working memory API | `app/controllers/working_memory_entries_controller.rb`, `app/models/working_memory_entry.rb` | Plain JSON CRUD for lightweight note capture |
 | Data model | `app/models/*.rb` | Associations and dependent destroys |
@@ -32,6 +32,10 @@ api/
 - Request specs are the fastest source of truth for status codes and JSON shapes.
 - Controllers currently render nested JSON directly with `as_json`; follow existing style unless doing a deliberate serialization refactor.
 - Nested creation routes matter: lists under boards and cards under lists only.
+- Boards now support archive lifecycle endpoints: active index at `GET /boards`, archived index at `GET /boards/archived`, archive at `PATCH /boards/:id/archive`, and unarchive at `PATCH /boards/:id/unarchive`.
+- Archiving a board removes it from the main boards index but does not remove access through `GET /boards/:id`; the show payload still includes `archived_at` so the frontend can label archived boards.
+- Failed board destroys should return structured `422` JSON errors; do not silently return `204` when `destroy!` fails.
+- Board → list and list → card foreign keys now use database-level `ON DELETE CASCADE` as a safety net alongside model `dependent: :destroy`.
 - Working memory entries are top-level resources at `/working_memory_entries` with index/create/update/destroy actions.
 - Keep working memory responses simple JSON shaped for the lightweight frontend modal flow unless requirements explicitly change.
 - The working-memory-to-board feature currently reuses existing `POST /boards`, `POST /boards/:board_id/lists`, and `POST /lists/:list_id/cards` endpoints; do not add a special-purpose backend route unless product scope changes.

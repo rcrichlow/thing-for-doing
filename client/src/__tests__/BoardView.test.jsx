@@ -3,12 +3,43 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import BoardView from '../pages/boards/BoardView';
 import * as api from '../services/api';
+import * as BoardContext from '../context/BoardContext';
 
 vi.mock('../services/api');
+vi.mock('../context/BoardContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useBoardContext: vi.fn(),
+  };
+});
 
 describe('BoardView', () => {
+  const renderBoardView = () => render(
+    <MemoryRouter initialEntries={['/boards/1']}>
+      <Routes>
+        <Route path="/boards" element={<div>Boards Index</div>} />
+        <Route path="/boards/archived" element={<div>Archived Boards Index</div>} />
+        <Route path="/boards/:id" element={<BoardView />} />
+      </Routes>
+    </MemoryRouter>
+  );
+
+  const mockDispatch = vi.fn();
+  const mockActions = {
+    SET_BOARDS: 'SET_BOARDS',
+    ADD_BOARD: 'ADD_BOARD',
+    ARCHIVE_BOARD: 'ARCHIVE_BOARD',
+    UNARCHIVE_BOARD: 'UNARCHIVE_BOARD',
+    DELETE_BOARD: 'DELETE_BOARD',
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    BoardContext.useBoardContext.mockReturnValue({
+      dispatch: mockDispatch,
+      actions: mockActions,
+    });
   });
 
   it('renders board title and lists', async () => {
@@ -23,13 +54,7 @@ describe('BoardView', () => {
     
     api.getBoard.mockResolvedValue(mockBoard);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     expect(await screen.findByText('Test Board')).toBeInTheDocument();
     expect(screen.getByText('To Do')).toBeInTheDocument();
@@ -50,13 +75,7 @@ describe('BoardView', () => {
     api.getBoard.mockResolvedValue(mockBoard);
     api.createList.mockResolvedValue(newList);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     await screen.findByText('Test Board');
 
@@ -85,13 +104,7 @@ describe('BoardView', () => {
     api.getBoard.mockResolvedValue(mockBoard);
     api.createCard.mockResolvedValue(newCard);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     await screen.findByText('Test Board');
 
@@ -121,13 +134,7 @@ describe('BoardView', () => {
     api.getBoard.mockResolvedValue(mockBoard);
     api.deleteCard.mockResolvedValue(null);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     fireEvent.click(await screen.findByText('Task 1'));
     fireEvent.click(await screen.findByTestId('card-detail-delete-btn'));
@@ -159,13 +166,7 @@ describe('BoardView', () => {
     api.getBoard.mockResolvedValue(mockBoard);
     api.deleteList.mockResolvedValue(null);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     await screen.findByText('Test Board');
     fireEvent.click(screen.getByTestId('delete-list-btn-101'));
@@ -201,13 +202,7 @@ describe('BoardView', () => {
     api.getBoard.mockResolvedValue(mockBoard);
     api.deleteList.mockResolvedValue(null);
 
-    render(
-      <MemoryRouter initialEntries={['/boards/1']}>
-        <Routes>
-          <Route path="/boards/:id" element={<BoardView />} />
-        </Routes>
-      </MemoryRouter>
-    );
+    renderBoardView();
 
     await screen.findByText('Test Board');
     fireEvent.click(screen.getByTestId('delete-list-btn-101'));
@@ -222,6 +217,147 @@ describe('BoardView', () => {
       expect(screen.queryByText('To Do')).not.toBeInTheDocument();
       expect(screen.queryByText('Task 1')).not.toBeInTheDocument();
     });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('archives an active board', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Active Board',
+      lists: []
+    };
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.archiveBoard.mockResolvedValue(null);
+
+    renderBoardView();
+
+    await screen.findByText('Active Board');
+    
+    const archiveBtn = screen.getByTitle('Archive Board');
+    fireEvent.click(archiveBtn);
+
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(api.archiveBoard).toHaveBeenCalledWith(1);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: mockActions.ARCHIVE_BOARD,
+        payload: mockBoard,
+      });
+    });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('deletes an active board', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Active Board',
+      lists: []
+    };
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.deleteBoard.mockResolvedValue(null);
+
+    renderBoardView();
+
+    await screen.findByText('Active Board');
+    
+    const deleteBtn = screen.getByTitle('Delete Board');
+    fireEvent.click(deleteBtn);
+
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(api.deleteBoard).toHaveBeenCalledWith(1);
+    });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('displays archived status and allows deleting archived board', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Archived Board',
+      archived_at: '2023-01-01',
+      lists: []
+    };
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.deleteBoard.mockResolvedValue(null);
+
+    renderBoardView();
+
+    await screen.findByText('Archived Board');
+    expect(screen.getByText('This board is archived.')).toBeInTheDocument();
+    expect(screen.queryByTitle('Archive Board')).not.toBeInTheDocument();
+
+    const deleteBtn = screen.getByText('Delete Permanently');
+    fireEvent.click(deleteBtn);
+
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(api.deleteBoard).toHaveBeenCalledWith(1);
+    });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('displays archived status and allows unarchiving archived board', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Archived Board',
+      archived_at: '2023-01-01',
+      lists: []
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.unarchiveBoard.mockResolvedValue(null);
+
+    renderBoardView();
+
+    await screen.findByText('Archived Board');
+    expect(screen.getByText('This board is archived.')).toBeInTheDocument();
+    
+    const unarchiveBtn = screen.getByTestId('unarchive-board-btn');
+    fireEvent.click(unarchiveBtn);
+
+    await waitFor(() => {
+      expect(api.unarchiveBoard).toHaveBeenCalledWith(1);
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: mockActions.UNARCHIVE_BOARD,
+        payload: { ...mockBoard, archived_at: null },
+      });
+    });
+  });
+
+  it('displays error when board delete fails', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Active Board',
+      lists: []
+    };
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.deleteBoard.mockRejectedValue(new Error('Network error'));
+
+    renderBoardView();
+
+    await screen.findByText('Active Board');
+    
+    const deleteBtn = screen.getByTitle('Delete Board');
+    fireEvent.click(deleteBtn);
+
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalled();
+      expect(api.deleteBoard).toHaveBeenCalledWith(1);
+    });
+
+    expect(await screen.findByText('Failed to delete board: Network error')).toBeInTheDocument();
 
     confirmSpy.mockRestore();
   });
