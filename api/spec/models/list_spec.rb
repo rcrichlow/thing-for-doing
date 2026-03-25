@@ -31,6 +31,16 @@ RSpec.describe List, type: :model do
 
       expect(Card.find_by(id: card_id)).to be_nil
     end
+
+    it 'cascades to cards at the database level when callbacks are bypassed' do
+      board = Board.create!(title: 'Test Board')
+      list = board.lists.create!(title: 'Test List')
+      card = list.cards.create!(title: 'Card 1')
+
+      list.delete
+
+      expect(Card.find_by(id: card.id)).to be_nil
+    end
   end
 
   describe 'validations' do

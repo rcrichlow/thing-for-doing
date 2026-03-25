@@ -87,9 +87,11 @@ describe('Empty States', () => {
 
       render(
         <MemoryRouter initialEntries={['/boards/1']}>
-          <Routes>
-            <Route path="/boards/:id" element={<BoardView />} />
-          </Routes>
+          <BoardProvider>
+            <Routes>
+              <Route path="/boards/:id" element={<BoardView />} />
+            </Routes>
+          </BoardProvider>
         </MemoryRouter>
       );
 
@@ -105,9 +107,11 @@ describe('Empty States', () => {
 
       render(
         <MemoryRouter initialEntries={['/boards/1']}>
-          <Routes>
-            <Route path="/boards/:id" element={<BoardView />} />
-          </Routes>
+          <BoardProvider>
+            <Routes>
+              <Route path="/boards/:id" element={<BoardView />} />
+            </Routes>
+          </BoardProvider>
         </MemoryRouter>
       );
 

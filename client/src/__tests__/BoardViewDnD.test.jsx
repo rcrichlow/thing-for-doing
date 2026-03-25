@@ -3,8 +3,16 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import BoardView from '../pages/boards/BoardView';
 import * as api from '../services/api';
+import * as BoardContext from '../context/BoardContext';
 
 vi.mock('../services/api');
+vi.mock('../context/BoardContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useBoardContext: vi.fn(),
+  };
+});
 
 let mockDragEndEvent = {
   active: { id: 201 },
@@ -36,12 +44,25 @@ vi.mock('@dnd-kit/core', async () => {
 });
 
 describe('BoardView DnD', () => {
+  const mockDispatch = vi.fn();
+  const mockActions = {
+    SET_BOARDS: 'SET_BOARDS',
+    ADD_BOARD: 'ADD_BOARD',
+    ARCHIVE_BOARD: 'ARCHIVE_BOARD',
+    UNARCHIVE_BOARD: 'UNARCHIVE_BOARD',
+    DELETE_BOARD: 'DELETE_BOARD',
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockDragEndEvent = {
       active: { id: 201 },
       over: { id: 102 }
     };
+    BoardContext.useBoardContext.mockReturnValue({
+      dispatch: mockDispatch,
+      actions: mockActions,
+    });
   });
 
   it('reorders cards within the same list', async () => {

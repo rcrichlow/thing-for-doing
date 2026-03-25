@@ -5,8 +5,26 @@ const BOARD_ACTIONS = {
   SET_BOARDS: 'SET_BOARDS',
   ADD_BOARD: 'ADD_BOARD',
   UPDATE_BOARD: 'UPDATE_BOARD',
+  ARCHIVE_BOARD: 'ARCHIVE_BOARD',
+  UNARCHIVE_BOARD: 'UNARCHIVE_BOARD',
   DELETE_BOARD: 'DELETE_BOARD'
 };
+
+function addOrUpdateBoard(boards, nextBoard) {
+  const existingBoardIndex = boards.findIndex((board) => board.id === nextBoard.id);
+
+  if (existingBoardIndex === -1) {
+    return [...boards, nextBoard];
+  }
+
+  return boards.map((board) => (
+    board.id === nextBoard.id ? nextBoard : board
+  ));
+}
+
+function getBoardId(payload) {
+  return typeof payload === 'object' && payload !== null ? payload.id : payload;
+}
 
 // Initial state
 const initialState = {
@@ -29,11 +47,23 @@ function boardReducer(state, action) {
           board.id === action.payload.id ? action.payload : board
         )
       };
-    
+
+    case BOARD_ACTIONS.ARCHIVE_BOARD:
+      return {
+        ...state,
+        boards: state.boards.filter((board) => board.id !== getBoardId(action.payload))
+      };
+
+    case BOARD_ACTIONS.UNARCHIVE_BOARD:
+      return {
+        ...state,
+        boards: addOrUpdateBoard(state.boards, action.payload)
+      };
+
     case BOARD_ACTIONS.DELETE_BOARD:
       return {
         ...state,
-        boards: state.boards.filter(board => board.id !== action.payload)
+        boards: state.boards.filter(board => board.id !== getBoardId(action.payload))
       };
     
     default:

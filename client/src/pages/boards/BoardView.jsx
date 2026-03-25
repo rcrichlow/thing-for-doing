@@ -35,6 +35,9 @@ export default function BoardView() {
     setTransferListId,
     handleDragStart,
     handleCardClick,
+    handleArchiveBoard,
+    handleUnarchiveBoard,
+    handleDeleteBoard,
     closeCardDetail,
     handleCardUpdate,
     handleCardDelete,
@@ -88,14 +91,60 @@ export default function BoardView() {
     </EmptyState>
   );
 
+  const isArchived = !!board.archived_at;
+
   return (
     <div className="h-full flex flex-col bg-zinc-950 overflow-hidden">
+      {/* Archived Banner */}
+      {isArchived && (
+        <div className="bg-amber-900/30 border-b border-amber-900/50 px-6 py-2 text-center text-amber-200 text-sm flex items-center justify-center gap-4">
+          <span>This board is archived.</span>
+          <button
+            onClick={handleUnarchiveBoard}
+            className="text-amber-100 font-medium underline hover:text-green-300"
+            data-testid="unarchive-board-btn"
+          >
+            Unarchive
+          </button>
+          <button 
+            onClick={handleDeleteBoard}
+            className="text-amber-100 font-medium underline hover:text-red-300"
+          >
+            Delete Permanently
+          </button>
+        </div>
+      )}
+
       {/* Board Header */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-100">{board.title}</h1>
-        <Link to="/boards" className="text-violet-400 hover:text-violet-300 text-sm font-medium">
-          &larr; Back to Boards
-        </Link>
+        <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
+          {board.title}
+          {isArchived && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Archived</span>}
+        </h1>
+        <div className="flex items-center gap-4">
+          {!isArchived && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleArchiveBoard}
+                className="text-zinc-400 hover:text-zinc-200 text-sm font-medium px-3 py-1.5 rounded hover:bg-zinc-800 transition-colors"
+                title="Archive Board"
+              >
+                Archive
+              </button>
+              <button
+                onClick={handleDeleteBoard}
+                className="text-zinc-400 hover:text-red-400 text-sm font-medium px-3 py-1.5 rounded hover:bg-zinc-800 transition-colors"
+                title="Delete Board"
+              >
+                Delete
+              </button>
+              <div className="h-4 w-px bg-zinc-700"></div>
+            </div>
+          )}
+          <Link to={isArchived ? "/boards/archived" : "/boards"} className="text-violet-400 hover:text-violet-300 text-sm font-medium">
+            &larr; {isArchived ? "Back to Archived" : "Back to Boards"}
+          </Link>
+        </div>
       </div>
 
       {actionError && (

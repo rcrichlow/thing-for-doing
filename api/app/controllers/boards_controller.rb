@@ -2,7 +2,12 @@
 
 class BoardsController < ApplicationController
   def index
-    boards = Board.includes(lists: :cards).all
+    boards = Board.active.includes(lists: :cards)
+    render json: serialize_boards(boards)
+  end
+
+  def archived
+    boards = Board.archived.includes(lists: :cards)
     render json: serialize_boards(boards)
   end
 
@@ -29,9 +34,21 @@ class BoardsController < ApplicationController
     end
   end
 
+  def archive
+    board = Board.find(params[:id])
+    board.archive!
+    head :no_content
+  end
+
+  def unarchive
+    board = Board.find(params[:id])
+    board.unarchive!
+    head :no_content
+  end
+
   def destroy
     board = Board.find(params[:id])
-    board.destroy
+    board.destroy!
     head :no_content
   end
 

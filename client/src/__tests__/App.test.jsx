@@ -5,7 +5,10 @@ import { BoardProvider } from '../context/BoardContext';
 
 vi.mock('../services/api', () => ({
   getBoards: vi.fn().mockResolvedValue([]),
+  getArchivedBoards: vi.fn().mockResolvedValue([]),
   createBoard: vi.fn(),
+  archiveBoard: vi.fn(),
+  unarchiveBoard: vi.fn(),
   updateBoard: vi.fn(),
   deleteBoard: vi.fn(),
   getLists: vi.fn().mockResolvedValue([]),

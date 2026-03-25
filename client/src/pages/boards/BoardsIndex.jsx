@@ -11,7 +11,8 @@ export default function BoardsIndex() {
     isCreating,
     setIsCreating,
     loading,
-    handleCreateBoard
+    handleCreateBoard,
+    handleArchiveBoard
   } = useBoardsIndexState();
 
   if (loading && boards.length === 0) {
@@ -28,6 +29,12 @@ export default function BoardsIndex() {
       <div className="py-6 h-[calc(100vh-100px)]">
          <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">Your Boards</h1>
+            <Link 
+              to="/boards/archived"
+              className="text-zinc-400 hover:text-zinc-100 transition-colors"
+            >
+              Archived Boards
+            </Link>
          </div>
         <EmptyState
           title="No boards yet"
@@ -38,13 +45,15 @@ export default function BoardsIndex() {
             </svg>
           }
         >
-          <button
-            onClick={() => setIsCreating(true)}
-            data-testid="new-board-btn"
-            className="inline-flex items-center rounded-md border border-transparent bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
-          >
-            Create New Board
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setIsCreating(true)}
+              data-testid="new-board-btn"
+              className="inline-flex items-center rounded-md border border-transparent bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            >
+              Create New Board
+            </button>
+          </div>
         </EmptyState>
       </div>
     );
@@ -54,6 +63,12 @@ export default function BoardsIndex() {
     <div className="py-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-zinc-100 tracking-tight">Your Boards</h1>
+        <Link 
+          to="/boards/archived"
+          className="text-zinc-400 hover:text-zinc-100 transition-colors"
+        >
+          Archived Boards
+        </Link>
       </div>
 
       {localError && (
@@ -72,9 +87,19 @@ export default function BoardsIndex() {
             className="group block h-40 p-6 bg-zinc-900 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 border border-zinc-800 hover:border-violet-500 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-1 h-full bg-violet-500 transform scale-y-0 group-hover:scale-y-100 transition-transform origin-top duration-200"></div>
-            <h2 className="text-xl font-bold text-zinc-200 mb-2 group-hover:text-violet-400 transition-colors truncate">
+            <h2 className="text-xl font-bold text-zinc-200 mb-2 group-hover:text-violet-400 transition-colors truncate pr-8">
               {board.title}
             </h2>
+            <button
+              onClick={(e) => handleArchiveBoard(e, board)}
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-zinc-800 text-zinc-500 hover:text-amber-400 hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-all duration-200"
+              title="Archive Board"
+              data-testid={`archive-board-${board.id}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+            </button>
             <p className="text-xs text-zinc-500 mt-auto absolute bottom-4 left-6">
               Created {new Date(board.created_at).toLocaleDateString()}
             </p>
