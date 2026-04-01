@@ -35,5 +35,5 @@
     "vite": "^6.0.5",
     "vitest": "^4.1.0"
   },
-  "packageManager": "bun@latest"
+  "packageManager": "bun@1.2.21"
 }
