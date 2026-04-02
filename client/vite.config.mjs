@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 const apiProxyTarget = process.env.VITE_API_PROXY_TARGET || 'http://api:3000'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ jsxRuntime: 'automatic' })],
   server: {
     port: 5173,
     host: true,

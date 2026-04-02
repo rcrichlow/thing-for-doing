@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
 import { getBoards, createBoard, createList, createCard } from '../../services/api';
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import Modal from '../../components/Modal';
 import WorkingMemoryEntry from './WorkingMemoryEntry';
 import SendToBoardModal from './SendToBoardModal';

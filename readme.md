@@ -88,7 +88,7 @@ if it's actionable or not.
 
 - React 18
 - React Router
-- Vite
+- Vite 8
 - Bun
 - Tailwind CSS
 - Vitest
@@ -118,6 +118,8 @@ See `api/config/routes.rb` for the full route definitions.
 ## Local Development
 
 This project runs through Docker Compose. The frontend uses Bun, and the backend/frontend share an external Docker network named `tfd-network`.
+
+If you run the frontend outside Docker for any reason, Vite 8 requires Node `20.19+` or `22.12+`.
 
 Create the shared Docker network once if needed:
 
@@ -189,7 +191,7 @@ Raw Playwright invocation is intentionally blocked unless the isolated E2E envir
 ## Implementation Notes
 
 - Working Memory is the current home experience
-- Frontend API calls go through the Vite `/api` proxy, not hard-coded backend URLs
+- Frontend API calls go through the Vite 8 `/api` proxy, not hard-coded backend URLs
 - Board payloads include nested lists and cards
 - Board payloads include `archived_at`, which drives archived list placement and archived board indicators in the UI
 - Card ordering is persisted through `position`

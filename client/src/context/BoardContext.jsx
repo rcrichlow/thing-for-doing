@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext } from 'react';
 
 // Action types
 const BOARD_ACTIONS = {

@@ -1,7 +1,7 @@
 # CLIENT KNOWLEDGE BASE
 
 ## OVERVIEW
-React 18 + Vite frontend for working memory, boards, and drag-and-drop flows; Bun is the package manager and Playwright/Vitest cover the app.
+React 18 + Vite 8 frontend for working memory, boards, and drag-and-drop flows; Bun is the package manager and Playwright/Vitest cover the app.
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
@@ -34,9 +34,10 @@ client/
 
 ## CONVENTIONS
 - Use Bun commands, usually via Docker: `docker compose exec client bun ...`.
-- Vite proxy owns backend access; keep API calls on `/api` instead of embedding `http://api:3000` in source files.
+- Vite 8 proxy owns backend access; keep API calls on `/api` instead of embedding `http://api:3000` in source files.
+- If you run the frontend outside Docker, use Node `^20.19.0 || >=22.12.0` to satisfy Vite 8.
 - Preserve `data-testid` attributes unless tests are intentionally updated in the same change.
-- Keep Vitest scoped to app tests only; `vite.config.js` excludes `node_modules/**` and `tests/e2e/**` for a reason.
+- Keep Vitest scoped to app tests only; `vite.config.mjs` excludes `node_modules/**` and `tests/e2e/**` for a reason.
 - Follow current route structure exactly: `/`, `/working-memory`, `/boards`, `/boards/archived`, `/boards/:id`.
 - `/` redirects to `/working-memory`; treat the working memory page as the default landing experience.
 - `App.jsx` wraps page routes in `ErrorBoundary`; preserve route-level crash isolation when changing routing.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import insertTextAtSelection from '../../utils/insertTextAtSelection';
 
 export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry, onUpdateEntry }) {

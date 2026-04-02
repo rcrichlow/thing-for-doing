@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * EmptyState component for consistent empty state messaging
  * @param {Object} props
