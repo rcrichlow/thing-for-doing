@@ -32,9 +32,72 @@ test.describe('Board Management', () => {
   test('should navigate back to boards list', async ({ page }) => {
     await setupTestBoard(page);
 
-    await page.locator('a[href="/boards"]').click();
+    await page.getByRole('link', { name: '← Back to Boards' }).click();
 
     await expect(page).toHaveURL('/boards');
     await expect(page.getByTestId('new-board-btn')).toBeVisible();
+  });
+
+  test('should edit board title', async ({ page }) => {
+    const { boardId, boardTitle } = await setupTestBoard(page);
+
+    // Verify original title is displayed
+    await expect(page.locator('h1')).toContainText(boardTitle);
+
+    // Click on the title to edit
+    await page.locator('h1 span[title*="edit"]').click();
+
+    // Input should be visible with original title
+    const titleInput = page.getByTestId('board-title-input');
+    await expect(titleInput).toBeVisible();
+    await expect(titleInput).toHaveValue(boardTitle);
+
+    // Update the title
+    const newTitle = `Updated Board ${Date.now()}`;
+    await titleInput.fill(newTitle);
+    await titleInput.blur();
+
+    // New title should be displayed
+    await expect(page.locator('h1')).toContainText(newTitle);
+
+    // Verify title persists after page refresh
+    await page.reload();
+    await expect(page.locator('h1')).toContainText(newTitle);
+
+    // Verify title updates in boards list
+    await page.goto('/boards');
+    await expect(page.getByTestId('board-card').filter({ hasText: newTitle })).toBeVisible();
+  });
+
+  test('should cancel board title edit with Escape', async ({ page }) => {
+    const { boardTitle } = await setupTestBoard(page);
+
+    // Click on the title to edit
+    await page.locator('h1 span[title*="edit"]').click();
+
+    // Change the title but press Escape
+    const titleInput = page.getByTestId('board-title-input');
+    await titleInput.fill('Cancelled Title');
+    await titleInput.press('Escape');
+
+    // Original title should still be displayed
+    await expect(page.locator('h1')).toContainText(boardTitle);
+    await expect(titleInput).not.toBeVisible();
+  });
+
+  test('should save board title with Enter key', async ({ page }) => {
+    const { boardTitle } = await setupTestBoard(page);
+
+    // Click on the title to edit
+    await page.locator('h1 span[title*="edit"]').click();
+
+    // Update the title and press Enter
+    const titleInput = page.getByTestId('board-title-input');
+    const newTitle = `Enter Key Title ${Date.now()}`;
+    await titleInput.fill(newTitle);
+    await titleInput.press('Enter');
+
+    // New title should be displayed
+    await expect(page.locator('h1')).toContainText(newTitle);
   });
 });

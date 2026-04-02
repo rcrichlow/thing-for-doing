@@ -31,13 +31,19 @@ export default function BoardView() {
     selectedCard,
     listPendingDelete,
     transferListId,
+    isTitleEditing,
+    editedTitle,
     setNewListTitle,
     setTransferListId,
+    setEditedTitle,
     handleDragStart,
     handleCardClick,
     handleArchiveBoard,
     handleUnarchiveBoard,
     handleDeleteBoard,
+    handleTitleEditStart,
+    handleTitleEditCancel,
+    handleTitleUpdate,
     closeCardDetail,
     handleCardUpdate,
     handleCardDelete,
@@ -117,10 +123,43 @@ export default function BoardView() {
 
       {/* Board Header */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
-          {board.title}
-          {isArchived && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Archived</span>}
-        </h1>
+        <div className="flex items-center gap-3">
+          {isTitleEditing ? (
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={handleTitleUpdate}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleTitleUpdate();
+                } else if (e.key === 'Escape') {
+                  handleTitleEditCancel();
+                }
+              }}
+              autoFocus
+              className="text-2xl font-bold bg-zinc-800 text-zinc-100 px-3 py-1 rounded focus:outline-none outline outline-1 outline-zinc-700 focus:outline-2 focus:outline-violet-500"
+              data-testid="board-title-input"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
+              <button
+                type="button"
+                className="flex items-center gap-2 group cursor-pointer hover:text-zinc-300 transition-colors px-3 py-1 bg-transparent border-0 text-2xl font-bold text-zinc-100 rounded"
+                onClick={handleTitleEditStart}
+                title="Click to edit board title"
+              >
+                {board.title}
+                <span className="opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity text-zinc-500">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </span>
+              </button>
+              {isArchived && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Archived</span>}
+            </h1>
+          )}
+        </div>
         <div className="flex items-center gap-4">
           {!isArchived && (
             <div className="flex items-center gap-2">

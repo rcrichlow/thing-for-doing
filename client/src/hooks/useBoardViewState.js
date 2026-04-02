@@ -10,6 +10,7 @@ import {
   deleteList,
   getBoard,
   updateCard,
+  updateBoard,
   archiveBoard,
   unarchiveBoard,
   deleteBoard
@@ -154,6 +155,8 @@ export default function useBoardViewState(boardId) {
   const [transferListId, setTransferListId] = useState('');
   const [isDeletingCard, setIsDeletingCard] = useState(false);
   const [isDeletingList, setIsDeletingList] = useState(false);
+  const [isTitleEditing, setIsTitleEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
   const { loading, error, clearError, runAsync } = useAsyncPageData();
 
   useEffect(() => {
@@ -206,6 +209,44 @@ export default function useBoardViewState(boardId) {
       setActionError(`Failed to delete board: ${getErrorMessage(err)}`);
     }
   }, [board, dispatch, actions, navigate]);
+
+  const resetTitleEditState = useCallback(() => {
+    setIsTitleEditing(false);
+    setEditedTitle('');
+  }, []);
+
+  const handleTitleEditStart = useCallback(() => {
+    if (!board) return;
+    setEditedTitle(board.title);
+    setIsTitleEditing(true);
+  }, [board]);
+
+  const handleTitleEditCancel = useCallback(() => {
+    resetTitleEditState();
+  }, [resetTitleEditState]);
+
+  const handleTitleUpdate = useCallback(async () => {
+    if (!board) return;
+
+    const trimmedTitle = editedTitle.trim();
+
+    if (!trimmedTitle || trimmedTitle === board.title) {
+      resetTitleEditState();
+      return;
+    }
+
+    try {
+      const updatedBoard = await updateBoard(board.id, { title: trimmedTitle });
+      setBoard(updatedBoard);
+      dispatch({ type: actions.UPDATE_BOARD, payload: updatedBoard });
+      resetTitleEditState();
+      setActionError(null);
+      clearError();
+    } catch (err) {
+      setActionError(`Failed to update board title: ${getErrorMessage(err)}`);
+      resetTitleEditState();
+    }
+  }, [board, editedTitle, dispatch, actions, clearError, resetTitleEditState]);
 
   const handleCardClick = useCallback((card) => {
     setSelectedCard(card);
@@ -423,13 +464,19 @@ export default function useBoardViewState(boardId) {
     selectedCard,
     listPendingDelete,
     transferListId,
+    isTitleEditing,
+    editedTitle,
     setNewListTitle,
     setTransferListId,
+    setEditedTitle,
     handleDragStart,
     handleCardClick,
     handleArchiveBoard,
     handleUnarchiveBoard,
     handleDeleteBoard,
+    handleTitleEditStart,
+    handleTitleEditCancel,
+    handleTitleUpdate,
     closeCardDetail,
     handleCardUpdate,
     handleCardDelete,
