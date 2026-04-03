@@ -119,7 +119,7 @@ See `api/config/routes.rb` for the full route definitions.
 
 This project runs through Docker Compose. The frontend uses Bun, and the backend/frontend share an external Docker network named `tfd-network`.
 
-If you run the frontend outside Docker for any reason, Vite 8 requires Node `20.19+` or `22.12+`.
+If you run the frontend outside Docker for any reason, Vite 8 requires Node `^20.19.0 || >=22.12.0`.
 
 Create the shared Docker network once if needed:
 
