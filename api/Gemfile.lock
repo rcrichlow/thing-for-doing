@@ -262,16 +262,16 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  debug
-  pg (~> 1.5)
-  puma (~> 6.5)
-  rack-cors
-  rails (~> 8.0)
-  rspec-rails (~> 7.0)
-  rubocop
+  debug (= 1.11.1)
+  pg (= 1.6.3)
+  puma (= 6.6.1)
+  rack-cors (= 3.0.0)
+  rails (= 8.1.2)
+  rspec-rails (= 7.1.1)
+  rubocop (= 1.85.1)
 
 RUBY VERSION
-   ruby 3.4.8p72
+   ruby 3.4.9p82
 
 BUNDLED WITH
    2.6.9
