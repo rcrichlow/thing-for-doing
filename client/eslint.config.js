@@ -60,5 +60,13 @@ export default [
         ...globals.node
       }
     }
+  },
+  {
+    files: ['vite.config.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    }
   }
 ];

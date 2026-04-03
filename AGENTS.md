@@ -5,7 +5,7 @@
 **Branch:** master
 
 ## OVERVIEW
-Kanban app with a working-memory home view: Rails 8 JSON API in `api/`, React 18 + Vite frontend in `client/`, workflow artifacts in `.sisyphus/`.
+Kanban app with a working-memory home view: Rails 8 JSON API in `api/`, React 18 + Vite 8 frontend in `client/`, workflow artifacts in `.sisyphus/`.
 
 ## STRUCTURE
 ```text
@@ -52,7 +52,10 @@ thing-for-doing/
 ## CONVENTIONS
 - All real app commands run through Docker, not host language runtimes.
 - Client package manager is Bun. Do not switch to npm or Yarn.
-- Frontend API calls go through Vite proxy path `/api`, not hard-coded backend URLs.
+- Frontend API calls go through the Vite 8 proxy path `/api`, not hard-coded backend URLs.
+- If the frontend is ever run outside Docker, keep the runtime on Node `^20.19.0 || >=22.12.0` to satisfy Vite 8.
+- Frontend work is not complete until the relevant lint and test/build commands pass; treat lint as part of normal verification, not an optional extra.
+- Never disable lint rules, downgrade errors to warnings, or add ignore comments just to get lint passing; fix the underlying problem unless the user explicitly asks for a rule change.
 - Rails responses are plain JSON via `as_json`; preserve nested board/list/card shapes unless intentionally changing the API contract.
 - `/` redirects to `/working-memory`; treat working memory as the current home experience unless intentionally changing navigation.
 - Working memory entry creation is currently a lightweight custom modal opened by typing anywhere outside form fields; backdrop click and `Escape` close it, `Enter` submits, and `Shift+Enter` promotes the field into multiline mode.
@@ -73,7 +76,7 @@ thing-for-doing/
 ## ANTI-PATTERNS (THIS PROJECT)
 - Do not run Rails or Bun commands outside containers.
 - Do not break the shared external Docker network `tfd-network` used by both compose stacks.
-- Do not let Vitest discover Playwright specs; `client/vite.config.js` must keep `tests/e2e/**` excluded.
+- Do not let Vitest discover Playwright specs; `client/vite.config.mjs` must keep `tests/e2e/**` excluded.
 - Do not rely on truncated UI text for E2E navigation when response data gives a stable ID.
 - Do not reintroduce a third-party modal library for working memory or card details unless there is an explicit product need.
 - Do not reintroduce removed note or notebook workflows without explicitly changing product scope and verification.
@@ -92,6 +95,7 @@ docker network create tfd-network
 cd api && docker compose up -d
 cd client && docker compose up -d
 
+cd client && docker compose exec client bun run lint
 cd api && docker compose exec api bundle exec rspec
 cd client && docker compose exec client bun run test -- --run
 cd client && docker compose exec client bun run build
