@@ -46,6 +46,7 @@ export default function BoardView() {
     handleTitleUpdate,
     closeCardDetail,
     handleCardUpdate,
+    handleListUpdated,
     handleCardDelete,
     handleCreateList,
     handleCardAdded,
@@ -207,6 +208,7 @@ export default function BoardView() {
                 onCardAdded={handleCardAdded}
                 onCardClick={handleCardClick}
                 onDeleteList={handleListDeleteRequest}
+                onListUpdated={handleListUpdated}
               />
             ))}
 
