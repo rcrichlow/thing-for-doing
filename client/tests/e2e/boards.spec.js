@@ -39,7 +39,7 @@ test.describe('Board Management', () => {
   });
 
   test('should edit board title', async ({ page }) => {
-    const { boardId, boardTitle } = await setupTestBoard(page);
+    const { boardTitle } = await setupTestBoard(page);
 
     // Verify original title is displayed
     await expect(page.locator('h1')).toContainText(boardTitle);
@@ -86,7 +86,7 @@ test.describe('Board Management', () => {
   });
 
   test('should save board title with Enter key', async ({ page }) => {
-    const { boardTitle } = await setupTestBoard(page);
+    await setupTestBoard(page);
 
     // Click on the title button to edit
     await page.locator('h1 button[title*="Edit"]').click();
@@ -99,5 +99,76 @@ test.describe('Board Management', () => {
 
     // New title should be displayed
     await expect(page.locator('h1')).toContainText(newTitle);
+  });
+
+  test('should edit list title', async ({ page }) => {
+    await setupTestBoard(page);
+
+    // Create a list
+    await page.getByTestId('list-title-input').fill('Original List');
+    await page.getByTestId('add-list-btn').click();
+
+    // Wait for list to appear
+    const listColumn = page.getByTestId('list-column').filter({ hasText: 'Original List' });
+    await expect(listColumn).toBeVisible();
+
+    // Click on list title button to edit - find the title button within the list column
+    const titleButton = listColumn.locator('button[title="Edit list title"]');
+    await titleButton.click();
+
+    // Input should appear with original title
+    const titleInput = page.getByTestId(/list-title-edit-input-/);
+    await expect(titleInput).toBeVisible();
+    await expect(titleInput).toHaveValue('Original List');
+
+    // Update the title
+    await titleInput.fill('Updated List');
+    await titleInput.blur();
+
+    // New title should be displayed - get fresh reference after update
+    const updatedListColumn = page.getByTestId('list-column').filter({ hasText: 'Updated List' });
+    await expect(updatedListColumn).toBeVisible();
+
+    // Verify persists after refresh
+    await page.reload();
+    await expect(page.getByText('Updated List')).toBeVisible();
+  });
+
+  test('should cancel list title edit with Escape', async ({ page }) => {
+    await setupTestBoard(page);
+
+    await page.getByTestId('list-title-input').fill('My List');
+    await page.getByTestId('add-list-btn').click();
+
+    const listColumn = page.getByTestId('list-column').filter({ hasText: 'My List' });
+    const titleButton = listColumn.locator('button[title="Edit list title"]');
+    await titleButton.click();
+
+    const titleInput = page.getByTestId(/list-title-edit-input-/);
+    await titleInput.fill('Cancelled Title');
+    await titleInput.press('Escape');
+
+    // Original title should still be displayed
+    await expect(listColumn).toContainText('My List');
+    await expect(titleInput).not.toBeVisible();
+  });
+
+  test('should save list title with Enter key', async ({ page }) => {
+    await setupTestBoard(page);
+
+    await page.getByTestId('list-title-input').fill('Enter List');
+    await page.getByTestId('add-list-btn').click();
+
+    const listColumn = page.getByTestId('list-column').filter({ hasText: 'Enter List' });
+    const titleButton = listColumn.locator('button[title="Edit list title"]');
+    await titleButton.click();
+
+    const titleInput = page.getByTestId(/list-title-edit-input-/);
+    await titleInput.fill('Enter Key List');
+    await titleInput.press('Enter');
+
+    // New title should be displayed - get fresh reference after update
+    const updatedListColumn = page.getByTestId('list-column').filter({ hasText: 'Enter Key List' });
+    await expect(updatedListColumn).toBeVisible();
   });
 });

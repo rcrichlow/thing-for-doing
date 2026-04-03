@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { createCard } from '../services/api';
+import { createCard, updateList } from '../services/api';
 import CardItem from './CardItem';
 
-export default function ListColumn({ list, onCardAdded, onCardClick, onDeleteList }) {
+export default function ListColumn({ list, onCardAdded, onCardClick, onDeleteList, onListUpdated }) {
   const { setNodeRef } = useDroppable({
     id: list.id,
   });
@@ -13,6 +13,45 @@ export default function ListColumn({ list, onCardAdded, onCardClick, onDeleteLis
   const [newCardTitle, setNewCardTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
+  const [titleError, setTitleError] = useState(null);
+
+  const resetTitleEditState = useCallback(() => {
+    setIsEditingTitle(false);
+    setEditedTitle('');
+  }, []);
+
+  const handleTitleEditStart = useCallback(() => {
+    setEditedTitle(list.title);
+    setIsEditingTitle(true);
+    setTitleError(null);
+  }, [list.title]);
+
+  const handleTitleEditCancel = useCallback(() => {
+    resetTitleEditState();
+    setTitleError(null);
+  }, [resetTitleEditState]);
+
+  const handleTitleUpdate = useCallback(async () => {
+    const trimmedTitle = editedTitle.trim();
+
+    if (!trimmedTitle || trimmedTitle === list.title) {
+      resetTitleEditState();
+      return;
+    }
+
+    try {
+      const updatedList = await updateList(list.id, { title: trimmedTitle });
+      onListUpdated(updatedList);
+      resetTitleEditState();
+      setTitleError(null);
+    } catch (err) {
+      setTitleError(`Failed to update list title: ${err.message || 'Unknown error'}`);
+      setEditedTitle(list.title);
+    }
+  }, [list, editedTitle, onListUpdated, resetTitleEditState]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +95,40 @@ export default function ListColumn({ list, onCardAdded, onCardClick, onDeleteLis
           </svg>
         </button>
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold">{list.title}</h3>
+          <div className="flex-1 min-w-0">
+            {isEditingTitle ? (
+              <div>
+                <input
+                  type="text"
+                  value={editedTitle}
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onBlur={handleTitleUpdate}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleTitleUpdate();
+                    } else if (e.key === 'Escape') {
+                      handleTitleEditCancel();
+                    }
+                  }}
+                  autoFocus
+                  className="w-full font-semibold bg-zinc-800 text-zinc-100 px-2 py-1 rounded focus:outline-none outline outline-1 outline-zinc-700 focus:outline-2 focus:outline-violet-500"
+                  data-testid={`list-title-edit-input-${list.id}`}
+                />
+                {titleError && (
+                  <div className="text-red-400 text-xs mt-1">{titleError}</div>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="w-full text-left font-semibold cursor-pointer transition-colors px-2 py-1 bg-transparent border-0 text-zinc-200 rounded"
+                onClick={handleTitleEditStart}
+                title="Edit list title"
+              >
+                {list.title}
+              </button>
+            )}
+          </div>
           <span className="text-xs text-zinc-500 font-normal whitespace-nowrap">{list.cards ? list.cards.length : 0} cards</span>
         </div>
       </div>

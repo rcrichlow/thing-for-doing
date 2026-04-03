@@ -269,6 +269,16 @@ export default function useBoardViewState(boardId) {
     } : prev);
   }, []);
 
+  const handleListUpdated = useCallback((updatedList) => {
+    if (!board) return;
+
+    const updatedLists = board.lists.map(list =>
+      list.id === updatedList.id ? updatedList : list
+    );
+
+    setBoard({ ...board, lists: updatedLists });
+  }, [board]);
+
   const handleCardDelete = useCallback(async (cardId) => {
     if (!window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
       return;
@@ -479,6 +489,7 @@ export default function useBoardViewState(boardId) {
     handleTitleUpdate,
     closeCardDetail,
     handleCardUpdate,
+    handleListUpdated,
     handleCardDelete,
     handleCreateList,
     handleCardAdded,
