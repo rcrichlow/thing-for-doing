@@ -44,8 +44,8 @@ test.describe('Board Management', () => {
     // Verify original title is displayed
     await expect(page.locator('h1')).toContainText(boardTitle);
 
-    // Click on the title to edit
-    await page.locator('h1 span[title*="edit"]').click();
+    // Click on the title button to edit
+    await page.locator('h1 button[title*="Edit"]').click();
 
     // Input should be visible with original title
     const titleInput = page.getByTestId('board-title-input');
@@ -72,8 +72,8 @@ test.describe('Board Management', () => {
   test('should cancel board title edit with Escape', async ({ page }) => {
     const { boardTitle } = await setupTestBoard(page);
 
-    // Click on the title to edit
-    await page.locator('h1 span[title*="edit"]').click();
+    // Click on the title button to edit
+    await page.locator('h1 button[title*="Edit"]').click();
 
     // Change the title but press Escape
     const titleInput = page.getByTestId('board-title-input');
@@ -88,8 +88,8 @@ test.describe('Board Management', () => {
   test('should save board title with Enter key', async ({ page }) => {
     const { boardTitle } = await setupTestBoard(page);
 
-    // Click on the title to edit
-    await page.locator('h1 span[title*="edit"]').click();
+    // Click on the title button to edit
+    await page.locator('h1 button[title*="Edit"]').click();
 
     // Update the title and press Enter
     const titleInput = page.getByTestId('board-title-input');
