@@ -26,10 +26,12 @@ if it's actionable or not.
 - Clear all working memory entries in one action
 - Send a working memory entry to a board without removing the entry
 - Create boards from the boards page or inline during send-to-board
+- Edit board titles inline from the board page
 - Archive boards so they leave the main boards list without deleting their contents
 - Browse archived boards separately and unarchive them back into the main boards list
 - Delete boards from board-level archive/detail flows
 - Create lists inside a board or inline during send-to-board
+- Edit list titles inline from the board page
 - Create cards inside lists
 - Edit and delete cards in a modal
 - Delete lists from the board UI, with optional card transfer to another list
@@ -66,6 +68,8 @@ if it's actionable or not.
 - Board responses include nested lists and cards
 - Lists and cards are returned in stable `position` order
 - Card details open in a centered modal
+- Board titles are click-to-edit from the board header
+- List titles are click-to-edit from each list header
 - Card title and description are click-to-edit fields
 - Card details include a delete action with confirmation
 - Lists can be deleted from the board UI
@@ -195,6 +199,7 @@ Raw Playwright invocation is intentionally blocked unless the isolated E2E envir
 - Board payloads include nested lists and cards
 - Board payloads include `archived_at`, which drives archived list placement and archived board indicators in the UI
 - Card ordering is persisted through `position`
+- Board and list titles support inline editing from the board view
 - The app uses shared modal primitives for working memory, send-to-board, and card details
 - Working memory supports inline editing, per-entry deletion, and multiline content
 - Board archive, unarchive, and deletion flows use confirmations or inline action affordances, and list deletion can transfer cards before removal
@@ -206,7 +211,7 @@ These are ideas, not committed roadmap items.
 
 - UI refresh with improved spacing, hierarchy, and visual consistency
 - Accessibility improvements across keyboard use, semantics, and screen reader support
-- Dark mode
+- Light mode or theme toggle
 - Better empty states
 - Global search across boards and cards
 - Labels or tags

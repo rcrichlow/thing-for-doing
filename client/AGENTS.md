@@ -50,7 +50,9 @@ client/
 - The send-to-board modal supports inline board/list creation and preserves multiline entry text in its preview; avoid nested forms inside that dialog.
 - Card details use the same custom modal family as working memory, not a right-side drawer.
 - Card detail fields are display-first and become editable only after click, and the modal also owns card deletion.
+- Board titles can be edited inline from the board header and saved with blur or `Enter`; `Escape` cancels.
 - Lists expose hover-delete affordances in board columns, and non-empty list deletion can transfer cards to another list before removal.
+- List titles can be edited inline from each list header and saved with blur or `Enter`; `Escape` cancels.
 - Active boards appear on `/boards`; archived boards are hidden there and instead appear on `/boards/archived`.
 - Archived boards can be unarchived from the archived boards index or from the archived board banner in `BoardView`.
 - Archived boards still render through the normal board detail page and currently remain editable; the archived state is informational plus list-placement behavior, not a read-only lock.
@@ -64,6 +66,7 @@ client/
 - Do not use `bun test` for Vitest coverage here; use `bun run test`.
 - Do not rely on full visible board-title text in Playwright when titles can truncate in the UI.
 - Do not remove readiness polling from Task 23-style clean-start integration coverage without replacing it with equally robust startup synchronization.
+- Do not invoke Playwright directly; use `./run-e2e.sh` from the repository root so tests run against the isolated E2E stack.
 - Do not reintroduce a third-party modal library for working memory or card details unless requirements change.
 - Do not reintroduce removed note or notebook UI flows without updating tests and evidence together.
 
@@ -73,7 +76,7 @@ cd client && docker compose up -d
 cd client && docker compose exec client bun run lint
 cd client && docker compose exec client bun run test -- --run
 cd client && docker compose exec client bun run build
-cd client && docker compose exec client bunx playwright test
+./run-e2e.sh
 ```
 
 ## NOTES
