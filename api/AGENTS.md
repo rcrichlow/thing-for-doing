@@ -55,5 +55,5 @@ cd api && docker compose exec api bundle exec rspec
 ```
 
 ## NOTES
-- Shared QA seed guidance and deterministic-ID assumptions live in `.sisyphus/plans/kanban-notes.md`.
 - `test/` exists from scaffold, but active verification work is centered in `spec/`.
+- When API behavior and docs drift, prefer current request specs, routes, and recent git history as the source of truth.

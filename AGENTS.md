@@ -1,18 +1,17 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-03-20 America/New_York
+**Generated:** 2026-04-03 America/New_York
 **Commit:** current working tree
-**Branch:** master
+**Branch:** current working tree
 
 ## OVERVIEW
-Kanban app with a working-memory home view: Rails 8 JSON API in `api/`, React 18 + Vite 8 frontend in `client/`, workflow artifacts in `.sisyphus/`.
+Kanban app with a working-memory home view: Rails 8 JSON API in `api/`, React 18 + Vite 8 frontend in `client/`, and supporting documentation in `readme.md` plus test coverage across the app.
 
 ## STRUCTURE
 ```text
 thing-for-doing/
 ├── api/         # Rails API, PostgreSQL, RSpec
 ├── client/      # React UI, Bun, Vitest, Playwright
-├── .sisyphus/   # plans, learnings, evidence, boulder state
 └── readme.md    # product scope and data model
 ```
 
@@ -20,20 +19,20 @@ thing-for-doing/
 | Task | Location | Notes |
 |---|---|---|
 | Product scope / entity model | `readme.md` | Boards, lists, cards |
-| Full implementation history / constraints | `.sisyphus/plans/kanban-notes.md` | Canonical workflow, guardrails, verification history |
+| Recent product/documentation changes | `git log`, `readme.md` | Recent commits plus current product description |
 | Backend routes / nested resources | `api/config/routes.rb` | Lists under boards, cards under lists, board archive/unarchive member routes |
 | Frontend app shell / routes | `client/src/App.jsx`, `client/src/components/AppLayout.jsx` | `/`, `/working-memory`, `/boards`, `/boards/archived`, active header nav |
 | Working memory frontend | `client/src/pages/working-memory/WorkingMemoryView.jsx` | Default landing page, keyboard-open modal composer, send-to-board flow |
 | Shared API client | `client/src/services/api.js` | Uses `/api` proxy, standardized JSON error handling |
 | Working memory API | `api/app/controllers/working_memory_entries_controller.rb` | Plain JSON CRUD for entries |
-| E2E helpers / integration flow | `client/tests/e2e/` | Stable board setup and Task 23 integrated flow |
-| Manual QA / evidence | `.sisyphus/evidence/` | Final QA screenshots + Task 23 JSON/PNG artifacts |
+| E2E helpers / integration flow | `client/tests/e2e/`, `run-e2e.sh` | Stable board setup plus isolated Playwright entrypoint |
 
 ## CODE MAP
 | Symbol | Type | Location | Role |
 |---|---|---|---|
 | `BoardProvider` | context provider | `client/src/context/BoardContext.jsx` | Global active board collection state with explicit archive/unarchive/delete lifecycle actions |
-| `BoardView` | page | `client/src/pages/boards/BoardView.jsx` | Board detail, archive state indicator, board archive/unarchive/delete actions, list creation, card/list deletion flows, card detail modal, DnD |
+| `BoardView` | page | `client/src/pages/boards/BoardView.jsx` | Board detail, inline board title editing, archive state indicator, board archive/unarchive/delete actions, list creation, card/list deletion flows, card detail modal, DnD |
+| `ListColumn` | component | `client/src/components/ListColumn.jsx` | List column UI, inline list title editing, card creation, delete affordance |
 | `ArchivedBoardsIndex` | page | `client/src/pages/boards/ArchivedBoardsIndex.jsx` | Archived board browsing plus unarchive/delete actions |
 | `useBoardsIndexState` | custom hook | `client/src/hooks/useBoardsIndexState.js` | Boards page fetch/create state and board context updates |
 | `WorkingMemoryView` | page | `client/src/pages/working-memory/WorkingMemoryView.jsx` | Root page, entry list, lightweight modal composer, send-to-board entry flow |
@@ -62,12 +61,14 @@ thing-for-doing/
 - Working memory entries support inline click-to-edit, preserve multiline content, and can be deleted individually with confirmation.
 - Working memory entries can be sent to boards without being removed; the send flow uses a custom modal with board/list selection, inline board/list creation, and a multiline-safe entry preview.
 - Card details now open in a centered modal, not a side drawer; title/description are click-to-edit and the modal includes card deletion.
+- Board titles can be edited inline from the board header and saved with blur or `Enter`; `Escape` cancels.
 - Boards can be archived from active board flows, disappear from the main boards list, and appear in `/boards/archived` until they are unarchived or deleted.
 - Archived boards remain viewable at their normal board URLs, show a visible archived indicator, and can be unarchived from either the archived boards index or the archived board page.
 - Archived boards currently behave like regular boards aside from being hidden from the main boards list and marked as archived; do not assume they are read-only unless requirements change.
 - Board deletion now fails loudly: failed `DELETE /boards/:id` destroys return structured `422` JSON errors instead of silent `204` success.
 - Board → list → card foreign keys now cascade deletes at the database level as a safety net; keep model-level `dependent: :destroy` callbacks too.
 - Lists can be deleted from the board UI; when a non-empty list is removed and another list exists, the delete flow can transfer cards before the list is deleted.
+- List titles can be edited inline from each list header and saved with blur or `Enter`; `Escape` cancels.
 - `BoardContext` is intentionally scoped to the active board collection only; archive, unarchive, and permanent delete use distinct reducer actions instead of overloading delete semantics.
 - Page-specific state has started moving into custom hooks (`useWorkingMemoryState`, `useBoardsIndexState`) instead of growing page components further.
 - Shared modal keyboard dismissal (`Escape`) now lives in `client/src/components/Modal.jsx`; keep modal close behavior centralized there.
@@ -83,8 +84,6 @@ thing-for-doing/
 - Do not edit committed secrets/runtime artifacts casually (`api/config/master.key`, temp/runtime files) without explicit need.
 
 ## UNIQUE STYLES
-- `.sisyphus/plans/kanban-notes.md` is the repo-specific source of truth for work sequencing, QA expectations, and accepted deviations.
-- Evidence-heavy workflow: meaningful UI/integration changes are backed by screenshots and JSON reports under `.sisyphus/evidence/`.
 - Frontend components use `data-testid` heavily; preserve them when refactoring test-covered UI.
 - Working memory intentionally favors personal-speed UX over robust accessibility right now; keep changes simple unless requirements change.
 
@@ -99,10 +98,10 @@ cd client && docker compose exec client bun run lint
 cd api && docker compose exec api bundle exec rspec
 cd client && docker compose exec client bun run test -- --run
 cd client && docker compose exec client bun run build
-cd client && docker compose exec client bunx playwright test
+./run-e2e.sh
 ```
 
 ## NOTES
 - No existing `AGENTS.md` or `CLAUDE.md` were present before this file.
 - `client/dist/`, Playwright reports, logs, and similar outputs are artifacts, not source of truth.
-- If behavior and tests disagree, check `.sisyphus/notepads/kanban-notes/` and evidence before changing product behavior.
+- If behavior and tests disagree, check recent git history plus request specs and frontend tests before changing product behavior.
