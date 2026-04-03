@@ -54,6 +54,8 @@ thing-for-doing/
 - Client package manager is Bun. Do not switch to npm or Yarn.
 - Frontend API calls go through the Vite 8 proxy path `/api`, not hard-coded backend URLs.
 - If the frontend is ever run outside Docker, keep the runtime on Node `^20.19.0 || >=22.12.0` to satisfy Vite 8.
+- Frontend work is not complete until the relevant lint and test/build commands pass; treat lint as part of normal verification, not an optional extra.
+- Never disable lint rules, downgrade errors to warnings, or add ignore comments just to get lint passing; fix the underlying problem unless the user explicitly asks for a rule change.
 - Rails responses are plain JSON via `as_json`; preserve nested board/list/card shapes unless intentionally changing the API contract.
 - `/` redirects to `/working-memory`; treat working memory as the current home experience unless intentionally changing navigation.
 - Working memory entry creation is currently a lightweight custom modal opened by typing anywhere outside form fields; backdrop click and `Escape` close it, `Enter` submits, and `Shift+Enter` promotes the field into multiline mode.
@@ -93,6 +95,7 @@ docker network create tfd-network
 cd api && docker compose up -d
 cd client && docker compose up -d
 
+cd client && docker compose exec client bun run lint
 cd api && docker compose exec api bundle exec rspec
 cd client && docker compose exec client bun run test -- --run
 cd client && docker compose exec client bun run build

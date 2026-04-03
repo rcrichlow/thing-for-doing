@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import BoardsIndex from './pages/boards/BoardsIndex';

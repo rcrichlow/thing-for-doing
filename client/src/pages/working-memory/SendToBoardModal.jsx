@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '../../components/Modal';
 import { getBoards, createBoard, createList, createCard } from '../../services/api';
 
@@ -34,7 +34,7 @@ export default function SendToBoardModal({ entry, onClose }) {
             setNewBoardName('');
             setCreatingBoard(false);
             setSelectedListId('');
-        } catch (err) {
+        } catch {
             setError('Failed to create board');
         } finally {
             setLoading(false);
@@ -55,7 +55,7 @@ export default function SendToBoardModal({ entry, onClose }) {
             setSelectedListId(String(newList.id));
             setNewListName('');
             setCreatingList(false);
-        } catch (err) {
+        } catch {
             setError('Failed to create list');
         } finally {
             setLoading(false);
@@ -71,7 +71,7 @@ export default function SendToBoardModal({ entry, onClose }) {
         try {
             await createCard(selectedListId, { title: entry.content });
             onClose();
-        } catch (err) {
+        } catch {
             setError('Failed to create card');
         } finally {
             setLoading(false);

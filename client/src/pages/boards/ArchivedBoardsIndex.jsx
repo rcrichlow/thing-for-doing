@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useBoardContext } from '../../context/BoardContext';
 import { getArchivedBoards, deleteBoard, unarchiveBoard } from '../../services/api';
@@ -16,7 +16,7 @@ export default function ArchivedBoardsIndex() {
         setLoading(true);
         const boards = await getArchivedBoards();
         setArchivedBoards(boards);
-      } catch (err) {
+      } catch {
         setError('Failed to load archived boards');
       } finally {
         setLoading(false);
@@ -34,7 +34,7 @@ export default function ArchivedBoardsIndex() {
         payload: { ...board, archived_at: null }
       });
       setArchivedBoards(prev => prev.filter(b => b.id !== board.id));
-    } catch (err) {
+    } catch {
       setError('Failed to unarchive board');
     }
   };
@@ -47,7 +47,7 @@ export default function ArchivedBoardsIndex() {
       await deleteBoard(board.id);
       dispatch({ type: actions.DELETE_BOARD, payload: board.id });
       setArchivedBoards(prev => prev.filter(b => b.id !== board.id));
-    } catch (err) {
+    } catch {
       setError('Failed to delete board');
     }
   };

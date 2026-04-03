@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 /**
  * Reusable modal component — wraps the existing inline backdrop/dialog pattern.
