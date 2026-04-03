@@ -31,13 +31,19 @@ export default function BoardView() {
     selectedCard,
     listPendingDelete,
     transferListId,
+    isTitleEditing,
+    editedTitle,
     setNewListTitle,
     setTransferListId,
+    setEditedTitle,
     handleDragStart,
     handleCardClick,
     handleArchiveBoard,
     handleUnarchiveBoard,
     handleDeleteBoard,
+    handleTitleEditStart,
+    handleTitleEditCancel,
+    handleTitleUpdate,
     closeCardDetail,
     handleCardUpdate,
     handleCardDelete,
@@ -78,7 +84,7 @@ export default function BoardView() {
         </svg>
       }
     >
-       <Link to="/boards" className="font-medium text-violet-400 transition-colors hover:text-violet-300">Return to Boards</Link>
+      <Link to="/boards" className="font-medium text-violet-400 transition-colors hover:text-violet-300">Return to Boards</Link>
     </EmptyState>
   );
 
@@ -106,7 +112,7 @@ export default function BoardView() {
           >
             Unarchive
           </button>
-          <button 
+          <button
             onClick={handleDeleteBoard}
             className="text-amber-100 font-medium underline hover:text-red-300"
           >
@@ -117,10 +123,38 @@ export default function BoardView() {
 
       {/* Board Header */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
-          {board.title}
-          {isArchived && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Archived</span>}
-        </h1>
+        <div className="flex items-center gap-3">
+          {isTitleEditing ? (
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={handleTitleUpdate}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleTitleUpdate();
+                } else if (e.key === 'Escape') {
+                  handleTitleEditCancel();
+                }
+              }}
+              autoFocus
+              className="text-2xl font-bold bg-zinc-800 text-zinc-100 px-3 py-1 rounded focus:outline-none outline outline-1 outline-zinc-700 focus:outline-2 focus:outline-violet-500"
+              data-testid="board-title-input"
+            />
+          ) : (
+            <h1 className="text-2xl font-bold text-zinc-100 flex items-center gap-3">
+              <button
+                type="button"
+                className="flex items-center cursor-pointer transition-colors px-3 py-1 bg-transparent border-0 text-2xl font-bold text-zinc-100 rounded"
+                onClick={handleTitleEditStart}
+                title="Edit board title"
+              >
+                {board.title}
+              </button>
+              {isArchived && <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700">Archived</span>}
+            </h1>
+          )}
+        </div>
         <div className="flex items-center gap-4">
           {!isArchived && (
             <div className="flex items-center gap-2">
@@ -178,36 +212,36 @@ export default function BoardView() {
 
             {/* Empty State for Board (No Lists) */}
             {(!board.lists || board.lists.length === 0) ? (
-               <div className="w-full h-full flex items-center justify-center">
-                 <div className="bg-zinc-900 p-8 rounded-xl shadow-lg border border-zinc-800 text-center max-w-md">
-                    <div className="mx-auto w-16 h-16 bg-violet-900/20 rounded-full flex items-center justify-center mb-4">
-                      <svg className="w-8 h-8 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-bold text-zinc-100 mb-2">Start your workflow</h3>
-                    <p className="text-zinc-400 mb-6">Create your first list to start adding cards and tasks to this board.</p>
-                    <form onSubmit={handleCreateList}>
-                      <input
-                        type="text"
-                        data-testid="list-title-input"
-                        placeholder="List Title (e.g. To Do)"
-                        className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-zinc-500"
-                        value={newListTitle}
-                        onChange={(e) => setNewListTitle(e.target.value)}
-                        autoFocus
-                      />
-                      <button
-                        type="submit"
-                        data-testid="add-list-btn"
-                        disabled={isCreatingList || !newListTitle.trim()}
-                        className="w-full bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-500 transition-colors disabled:opacity-50 font-medium"
-                      >
-                        {isCreatingList ? 'Creating...' : 'Create List'}
-                      </button>
-                    </form>
-                 </div>
-               </div>
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="bg-zinc-900 p-8 rounded-xl shadow-lg border border-zinc-800 text-center max-w-md">
+                  <div className="mx-auto w-16 h-16 bg-violet-900/20 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-zinc-100 mb-2">Start your workflow</h3>
+                  <p className="text-zinc-400 mb-6">Create your first list to start adding cards and tasks to this board.</p>
+                  <form onSubmit={handleCreateList}>
+                    <input
+                      type="text"
+                      data-testid="list-title-input"
+                      placeholder="List Title (e.g. To Do)"
+                      className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-zinc-500"
+                      value={newListTitle}
+                      onChange={(e) => setNewListTitle(e.target.value)}
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      data-testid="add-list-btn"
+                      disabled={isCreatingList || !newListTitle.trim()}
+                      className="w-full bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-500 transition-colors disabled:opacity-50 font-medium"
+                    >
+                      {isCreatingList ? 'Creating...' : 'Create List'}
+                    </button>
+                  </form>
+                </div>
+              </div>
             ) : (
               /* Add List Section (Sidebar style when lists exist) */
               <div className="w-80 flex-shrink-0">

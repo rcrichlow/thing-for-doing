@@ -29,6 +29,7 @@ describe('BoardView', () => {
   const mockActions = {
     SET_BOARDS: 'SET_BOARDS',
     ADD_BOARD: 'ADD_BOARD',
+    UPDATE_BOARD: 'UPDATE_BOARD',
     ARCHIVE_BOARD: 'ARCHIVE_BOARD',
     UNARCHIVE_BOARD: 'UNARCHIVE_BOARD',
     DELETE_BOARD: 'DELETE_BOARD',
@@ -360,5 +361,214 @@ describe('BoardView', () => {
     expect(await screen.findByText('Failed to delete board: Network error')).toBeInTheDocument();
 
     confirmSpy.mockRestore();
+  });
+
+  it('allows editing board title', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+    const updatedBoard = {
+      ...mockBoard,
+      title: 'Updated Title'
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.updateBoard.mockResolvedValue(updatedBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    // Click title to enter edit mode
+    fireEvent.click(titleElement);
+
+    // Input should appear with original title
+    const input = screen.getByTestId('board-title-input');
+    expect(input).toHaveValue('Original Title');
+
+    // Change the title
+    fireEvent.change(input, { target: { value: 'Updated Title' } });
+
+    // Blur to save
+    fireEvent.blur(input);
+
+    await waitFor(() => {
+      expect(api.updateBoard).toHaveBeenCalledWith(1, { title: 'Updated Title' });
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'UPDATE_BOARD',
+        payload: updatedBoard
+      });
+    });
+
+    expect(await screen.findByText('Updated Title')).toBeInTheDocument();
+  });
+
+  it('allows editing board title with Enter key', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+    const updatedBoard = {
+      ...mockBoard,
+      title: 'New Title'
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.updateBoard.mockResolvedValue(updatedBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    fireEvent.change(input, { target: { value: 'New Title' } });
+
+    // Press Enter to save
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    await waitFor(() => {
+      expect(api.updateBoard).toHaveBeenCalledWith(1, { title: 'New Title' });
+    });
+  });
+
+  it('cancels board title edit with Escape key', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    fireEvent.change(input, { target: { value: 'Changed Title' } });
+
+    // Press Escape to cancel
+    fireEvent.keyDown(input, { key: 'Escape' });
+
+    await waitFor(() => {
+      expect(api.updateBoard).not.toHaveBeenCalled();
+      expect(screen.getByText('Original Title')).toBeInTheDocument();
+    });
+  });
+
+  it('reverts to original title if empty on blur', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    fireEvent.change(input, { target: { value: '' } });
+
+    // Blur with empty value
+    fireEvent.blur(input);
+
+    await waitFor(() => {
+      expect(api.updateBoard).not.toHaveBeenCalled();
+      expect(screen.getByText('Original Title')).toBeInTheDocument();
+    });
+  });
+
+  it('reverts to original title if unchanged', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    
+    // Blur without changing value
+    fireEvent.blur(input);
+
+    await waitFor(() => {
+      expect(api.updateBoard).not.toHaveBeenCalled();
+      expect(screen.getByText('Original Title')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error message when board title update fails', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.updateBoard.mockRejectedValue(new Error('Update failed'));
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    fireEvent.change(input, { target: { value: 'New Title' } });
+    fireEvent.blur(input);
+
+    await waitFor(() => {
+      expect(api.updateBoard).toHaveBeenCalledWith(1, { title: 'New Title' });
+    });
+
+    expect(await screen.findByText(/Failed to update board title/)).toBeInTheDocument();
+  });
+
+  it('trims whitespace from board title', async () => {
+    const mockBoard = {
+      id: 1,
+      title: 'Original Title',
+      lists: []
+    };
+    const updatedBoard = {
+      ...mockBoard,
+      title: 'Trimmed Title'
+    };
+
+    api.getBoard.mockResolvedValue(mockBoard);
+    api.updateBoard.mockResolvedValue(updatedBoard);
+
+    renderBoardView();
+
+    const titleElement = await screen.findByText('Original Title');
+
+    fireEvent.click(titleElement);
+
+    const input = screen.getByTestId('board-title-input');
+    fireEvent.change(input, { target: { value: '  Trimmed Title  ' } });
+    fireEvent.blur(input);
+
+    await waitFor(() => {
+      expect(api.updateBoard).toHaveBeenCalledWith(1, { title: 'Trimmed Title' });
+    });
   });
 });

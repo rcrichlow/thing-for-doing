@@ -21,7 +21,7 @@ export async function setupTestBoard(page, title = null) {
   await page.goto(`/boards/${boardId}`);
   await page.waitForURL(`**/boards/${boardId}`, { timeout: 10000 });
   
-  return boardId.toString();
+  return { boardId: boardId.toString(), boardTitle: uniqueTitle };
 }
 
 export async function createList(page, title) {
