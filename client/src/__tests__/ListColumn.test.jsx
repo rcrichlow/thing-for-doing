@@ -44,7 +44,7 @@ describe('ListColumn - Title Editing', () => {
 
   it('renders list title as clickable button', () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     expect(titleButton).toBeInTheDocument();
     expect(titleButton).toHaveAttribute('title', 'Edit list title');
@@ -52,10 +52,10 @@ describe('ListColumn - Title Editing', () => {
 
   it('clicking title shows input with current value', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     expect(input).toBeInTheDocument();
     expect(input).toHaveValue('To Do');
@@ -67,14 +67,14 @@ describe('ListColumn - Title Editing', () => {
     api.updateList.mockResolvedValue(updatedList);
 
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: 'Updated List' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(api.updateList).toHaveBeenCalledWith(1, { title: 'Updated List' });
       expect(defaultProps.onListUpdated).toHaveBeenCalledWith(updatedList);
@@ -86,14 +86,14 @@ describe('ListColumn - Title Editing', () => {
     api.updateList.mockResolvedValue(updatedList);
 
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: 'New Title' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    
+
     await waitFor(() => {
       expect(api.updateList).toHaveBeenCalledWith(1, { title: 'New Title' });
       expect(defaultProps.onListUpdated).toHaveBeenCalledWith(updatedList);
@@ -102,53 +102,51 @@ describe('ListColumn - Title Editing', () => {
 
   it('Escape key cancels edit without saving', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: 'Cancelled' } });
     fireEvent.keyDown(input, { key: 'Escape' });
-    
+
     await waitFor(() => {
       expect(api.updateList).not.toHaveBeenCalled();
       expect(defaultProps.onListUpdated).not.toHaveBeenCalled();
       expect(input).not.toBeInTheDocument();
     });
 
-    // Original title should still be displayed
     expect(screen.getByRole('button', { name: 'To Do' })).toBeInTheDocument();
   });
 
   it('empty title reverts to original without saving', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: '' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(api.updateList).not.toHaveBeenCalled();
       expect(defaultProps.onListUpdated).not.toHaveBeenCalled();
     });
 
-    // Should exit edit mode and show original title
     expect(screen.getByRole('button', { name: 'To Do' })).toBeInTheDocument();
   });
 
   it('whitespace-only title reverts to original without saving', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: '   ' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(api.updateList).not.toHaveBeenCalled();
       expect(defaultProps.onListUpdated).not.toHaveBeenCalled();
@@ -159,14 +157,14 @@ describe('ListColumn - Title Editing', () => {
 
   it('unchanged title does not call API', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: 'To Do' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(api.updateList).not.toHaveBeenCalled();
       expect(defaultProps.onListUpdated).not.toHaveBeenCalled();
@@ -177,20 +175,19 @@ describe('ListColumn - Title Editing', () => {
     api.updateList.mockRejectedValue(new Error('Network error'));
 
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: 'Failed Update' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(screen.getByText(/Failed to update list title/)).toBeInTheDocument();
       expect(screen.getByText(/Network error/)).toBeInTheDocument();
     });
 
-    // Should stay in edit mode with original title restored in the input
     expect(screen.getByTestId('list-title-edit-input-1')).toHaveValue('To Do');
     expect(screen.getByTestId('list-title-edit-input-1')).toBeInTheDocument();
   });
@@ -200,14 +197,14 @@ describe('ListColumn - Title Editing', () => {
     api.updateList.mockResolvedValue(updatedList);
 
     render(<ListColumn {...defaultProps} />);
-    
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
+
     const input = screen.getByTestId('list-title-edit-input-1');
     fireEvent.change(input, { target: { value: '  Trimmed Title  ' } });
     fireEvent.blur(input);
-    
+
     await waitFor(() => {
       expect(api.updateList).toHaveBeenCalledWith(1, { title: 'Trimmed Title' });
     });
@@ -215,28 +212,24 @@ describe('ListColumn - Title Editing', () => {
 
   it('delete button remains visible during edit mode', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     const deleteButton = screen.getByTestId('delete-list-btn-1');
     expect(deleteButton).toBeInTheDocument();
-    
-    // Enter edit mode
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
-    // Delete button should still be present
+
     expect(screen.getByTestId('delete-list-btn-1')).toBeInTheDocument();
   });
 
   it('card count remains visible during edit mode', async () => {
     render(<ListColumn {...defaultProps} />);
-    
+
     expect(screen.getByText('2 cards')).toBeInTheDocument();
-    
-    // Enter edit mode
+
     const titleButton = screen.getByRole('button', { name: 'To Do' });
     fireEvent.click(titleButton);
-    
-    // Card count should still be present
+
     expect(screen.getByText('2 cards')).toBeInTheDocument();
   });
 });
