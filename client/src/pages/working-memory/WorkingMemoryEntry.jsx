@@ -30,9 +30,9 @@ export default function WorkingMemoryEntry({ entry, onSendToBoard, onDeleteEntry
             return;
         }
 
-        const cursorPositionAtEnd = draftContent.length;
-        inputRef.current?.setSelectionRange(cursorPositionAtEnd, cursorPositionAtEnd);
-    }, [draftContent, isEditing, isMultiline]);
+        const len = inputRef.current?.value.length ?? 0;
+        inputRef.current?.setSelectionRange(len, len);
+    }, [isEditing, isMultiline]);
 
     function formatDate(dateString) {
         return `${new Date(dateString).toLocaleDateString()} ${new Date(dateString).toLocaleTimeString()}`;
